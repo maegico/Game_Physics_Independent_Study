@@ -143,13 +143,11 @@
   <ItemGroup>
     <ClCompile Include="GraphicsCore.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="RenderCore.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="WindowsManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsCore.h" />
-    <ClInclude Include="RenderCore.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="WindowsManager.h" />
   </ItemGroup>
