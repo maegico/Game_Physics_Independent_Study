@@ -9,13 +9,14 @@ public:
 	WindowsManager(HINSTANCE hInstance, int nCmdShow, unsigned int width, unsigned int height, std::wstring winTitle);
 	~WindowsManager();
 
+	static WindowsManager* wndManagerInstance;
+	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	HRESULT Init();
 
 	WPARAM Run();
 
 private:
-	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	HINSTANCE hInstance;

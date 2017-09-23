@@ -1,8 +1,11 @@
 #include "WindowsManager.h"
 
+WindowsManager* WindowsManager::wndManagerInstance = nullptr;
+
 WindowsManager::WindowsManager(HINSTANCE hInstance, int nCmdShow, unsigned int width, unsigned int height, std::wstring winTitle)
 	: hInstance(hInstance), nCmdShow(nCmdShow), width(width), height(height), winTitle(winTitle)
 {
+	wndManagerInstance = this;
 	winClassName = L"WinClass";
 }
 
@@ -18,7 +21,7 @@ HRESULT WindowsManager::Init()
 
 	//ignoring cbClsExtra and cbWndExtra
 	winClass.style = CS_HREDRAW | CS_VREDRAW;
-	winClass.lpfnWndProc = WindowProc;
+	winClass.lpfnWndProc = WindowsManager::WindowProc;
 	winClass.hInstance = WindowsManager::hInstance;
 	winClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	winClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
@@ -88,7 +91,7 @@ WPARAM WindowsManager::Run()
 
 LRESULT WindowsManager::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	return HandleMsg(hWnd, msg, wParam, lParam);
+	return wndManagerInstance->HandleMsg(hWnd, msg, wParam, lParam);
 }
 
 LRESULT WindowsManager::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
