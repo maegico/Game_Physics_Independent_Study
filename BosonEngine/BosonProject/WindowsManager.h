@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <iostream>
-//#include "stdafx.h"
+#include "Game.h"
 
 class WindowsManager
 {
@@ -17,8 +17,6 @@ public:
 	WPARAM Run();
 
 private:
-	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	HINSTANCE hInstance;
 	HWND hWnd;
 	int nCmdShow;
@@ -26,5 +24,8 @@ private:
 	unsigned int height;
 	std::wstring winClassName;
 	std::wstring winTitle;
+	Game game;
+
+	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 

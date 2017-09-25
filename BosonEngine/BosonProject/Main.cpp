@@ -5,8 +5,8 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine, int nCmdShow)
 {
-	WindowsManager win(hInstance, nCmdShow, 1920, 1080, L"Boson Physics");
-	//WindowsManager win(hInstance, nCmdShow, 1024, 720, L"Boson Physics");
+	//WindowsManager win(hInstance, nCmdShow, 1920, 1080, L"Boson Physics");
+	WindowsManager win(hInstance, nCmdShow, 1024, 720, L"Boson Physics");
 
 	HRESULT result = E_FAIL;
 

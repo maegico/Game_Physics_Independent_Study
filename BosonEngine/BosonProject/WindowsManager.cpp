@@ -3,7 +3,8 @@
 WindowsManager* WindowsManager::wndManagerInstance = nullptr;
 
 WindowsManager::WindowsManager(HINSTANCE hInstance, int nCmdShow, unsigned int width, unsigned int height, std::wstring winTitle)
-	: hInstance(hInstance), nCmdShow(nCmdShow), width(width), height(height), winTitle(winTitle)
+	: hInstance(hInstance), nCmdShow(nCmdShow), width(width), height(height),
+	winTitle(winTitle)
 {
 	wndManagerInstance = this;
 	winClassName = L"WinClass";
@@ -60,6 +61,9 @@ HRESULT WindowsManager::Init()
 		return HRESULT_FROM_WIN32(err);
 	}
 
+	game = Game(width, height, hWnd);
+	game.Init();
+
 	ShowWindow(hWnd, nCmdShow);
 
 	return S_OK;
@@ -82,7 +86,10 @@ WPARAM WindowsManager::Run()
 		}
 		else
 		{
-			//run stuff here
+			//will pass in delta Time and total Time
+			//Or Graphics Core will just keep track
+			game.Update();
+			game.Draw();
 		}
 	}
 
