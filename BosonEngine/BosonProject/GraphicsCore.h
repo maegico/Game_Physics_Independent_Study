@@ -30,7 +30,9 @@ private:
 	D3D_FEATURE_LEVEL featureLvl;
 	IDXGISwapChain* swapChain;
 	ID3D11Device* device;
-	ID3D11DeviceContext* context;
+	ID3D11DeviceContext* immContext;
+	ID3D11DeviceContext* defContexts[7];
+	ID3D11CommandList* cmdLists[7];
 
 	ID3D11RenderTargetView* backBuffer;
 	ID3D11DepthStencilView* depthStencilView;

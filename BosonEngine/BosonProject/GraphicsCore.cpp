@@ -10,10 +10,12 @@ GraphicsCore::GraphicsCore(unsigned int width, unsigned int height, HWND hWnd)
 	: width(width), height(height), hWnd(hWnd)
 {
 	device = nullptr;
-	context = nullptr;
+	immContext = nullptr;
 	swapChain = nullptr;
 	backBuffer = nullptr;
 	depthStencilView = nullptr;
+
+	memset(defContexts, 0, sizeof(ID3D11DeviceContext*) * 7);
 }
 
 
@@ -23,7 +25,14 @@ GraphicsCore::~GraphicsCore()
 	if (backBuffer) { backBuffer->Release(); }
 
 	if (swapChain) { swapChain->Release(); }
-	if (context) { context->Release(); }
+
+	for (int i = 0; i < 7; i++)
+	{
+		if (defContexts[i])
+			defContexts[i]->Release();
+	}
+
+	if (immContext) { immContext->Release(); }
 	if (device) { device->Release(); }
 }
 
@@ -56,6 +65,9 @@ HRESULT GraphicsCore::InitGraphics()
 
 	HRESULT result = S_OK;
 
+	//For Multipass rendering, might not be important
+	//https://msdn.microsoft.com/en-us/library/windows/desktop/ff819064(v=vs.85).aspx
+
 	result = D3D11CreateDeviceAndSwapChain(
 		0,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -68,11 +80,28 @@ HRESULT GraphicsCore::InitGraphics()
 		&swapChain,
 		&device,
 		&featureLvl,
-		&context
+		&immContext	//NULL means it won't create the immediate context
 	);
 
 	if (FAILED(result)) return result;
 
+	for (int i = 0; i < 7; i++)
+	{
+		result = device->CreateDeferredContext(0, &defContexts[i]);
+		if (FAILED(result)) return result;
+	}
+
+	//check support for multithreading
+	D3D11_FEATURE_DATA_THREADING dxThreadSupport;
+	unsigned int dxThreadSupportSize = sizeof(D3D11_FEATURE_DATA_THREADING);
+	ZeroMemory(&dxThreadSupport, dxThreadSupportSize);
+
+	result = device->CheckFeatureSupport(D3D11_FEATURE_THREADING, &dxThreadSupport, dxThreadSupportSize);
+	if (FAILED(result)) return result;
+
+	if (dxThreadSupport.DriverConcurrentCreates == FALSE || dxThreadSupport.DriverCommandLists == FALSE)
+		return E_UNEXPECTED;
+	
 	ID3D11Texture2D* backBufferTexture;
 	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture);
 
@@ -98,7 +127,7 @@ HRESULT GraphicsCore::InitGraphics()
 	device->CreateDepthStencilView(depthBufferTexture, 0, &depthStencilView);
 	depthBufferTexture->Release();
 
-	context->OMSetRenderTargets(1, &backBuffer, depthStencilView);
+	immContext->OMSetRenderTargets(1, &backBuffer, depthStencilView);
 
 	D3D11_VIEWPORT viewport;
 	ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
@@ -108,7 +137,7 @@ HRESULT GraphicsCore::InitGraphics()
 	viewport.Height = (float)height;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
-	context->RSSetViewports(1, &viewport);
+	immContext->RSSetViewports(1, &viewport);
 
 	return S_OK;
 }
@@ -152,7 +181,7 @@ void GraphicsCore::OnResize(unsigned int width, unsigned int height)
 	device->CreateDepthStencilView(depthBufferTexture, 0, &depthStencilView);
 	depthBufferTexture->Release();
 
-	context->OMSetRenderTargets(1, &backBuffer, depthStencilView);
+	immContext->OMSetRenderTargets(1, &backBuffer, depthStencilView);
 
 	D3D11_VIEWPORT viewport;
 	ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
@@ -162,19 +191,26 @@ void GraphicsCore::OnResize(unsigned int width, unsigned int height)
 	viewport.Height = (float)height;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
-	context->RSSetViewports(1, &viewport);
+	immContext->RSSetViewports(1, &viewport);
 }
 
 void GraphicsCore::Draw()
 {
+	//Here is where we execute the command lists
+	//for (int i = 0; i < 7; i++)
+	//{
+	//	//Need to put in the command list
+	//	immContext->ExecuteCommandList(nullptr, FALSE);
+	//}
+
 	swapChain->Present(0, 0);
 }
 
 void GraphicsCore::ClearBackAndDepthBuffers()
 {
 	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
-	context->ClearRenderTargetView(backBuffer, color);
-	context->ClearDepthStencilView(
+	immContext->ClearRenderTargetView(backBuffer, color);
+	immContext->ClearDepthStencilView(
 		depthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 		1.0f,
