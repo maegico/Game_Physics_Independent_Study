@@ -87,6 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\DebugToolset;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,6 +146,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GraphicsCore.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ThreadManager.cpp" />
     <ClCompile Include="ThreadQueue.cpp" />
     <ClCompile Include="WindowsManager.cpp" />
@@ -152,9 +154,11 @@
   <ItemGroup>
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphicsCore.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="ThreadQueue.h" />
     <ClInclude Include="ThreadTesting.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowsManager.h" />
   </ItemGroup>
   <ItemGroup>

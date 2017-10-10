@@ -13,6 +13,7 @@ WindowsManager::WindowsManager(HINSTANCE hInstance, int nCmdShow, unsigned int w
 
 WindowsManager::~WindowsManager()
 {
+	delete game;
 }
 
 HRESULT WindowsManager::Init()
@@ -61,8 +62,9 @@ HRESULT WindowsManager::Init()
 		return HRESULT_FROM_WIN32(err);
 	}
 
-	game = Game(width, height, hWnd);
-	game.Init();
+	game = new Game(width, height, hWnd);
+	HRESULT result = game->Init();
+	if (FAILED(result)) return result;
 
 	ShowWindow(hWnd, nCmdShow);
 
@@ -88,8 +90,8 @@ WPARAM WindowsManager::Run()
 		{
 			//will pass in delta Time and total Time
 			//Or Graphics Core will just keep track
-			game.Update();
-			game.Draw();
+			game->Update();
+			game->Draw();
 		}
 	}
 

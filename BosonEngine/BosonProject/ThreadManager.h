@@ -5,10 +5,13 @@
 #include "ThreadQueue.h"
 #include <mutex>
 #include <cstdint>
+#include <vector>
 
+using std::vector;
 using std::thread;
 using std::mutex;
 using uint64 = uint64_t;
+using uint8 = uint8_t;
 
 class ThreadManager
 {
@@ -30,14 +33,18 @@ public:
 	// Doesn't actually work and isn't used, ignore it
 	//void PauseThreads(bool isPaused);
 
+	int getHdwConcurrency();
+
 private:
 	static ThreadManager* tmRef;	// A static thread manager pointer
 
 	bool bStop;						// whether to stop the threads
+	uint8 hdwConcurrency = 0;
 	uint64 iCount = 0;				// The number of operations run
 
 	mutex mtx;						// Manages the queues
-	thread threadPool[7];			// A basic thread pool that runs the tasks in the queues
+	//thread threadPool[7];			// A basic thread pool that runs the tasks in the queues
+	std::vector<thread*> threadPool;
 
 	ThreadQueue* lowPriorityQueue;	//a queue that stores low priority tasks
 	ThreadQueue* highPriorityQueue;	//a queue that stores high priority task

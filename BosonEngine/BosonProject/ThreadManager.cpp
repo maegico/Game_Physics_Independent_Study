@@ -10,9 +10,13 @@ ThreadManager::ThreadManager()
 
 	bStop = false;
 #ifndef SINGLE_THREADED
-	for(int i = 0; i < 7; i++)
+	hdwConcurrency = thread::hardware_concurrency();
+
+	threadPool.reserve(hdwConcurrency);
+
+	for(int i = 0; i < hdwConcurrency; i++)
 	{
-		threadPool[i] = thread(&ThreadManager::run, this);
+		threadPool.push_back(new thread(&ThreadManager::run, this));
 	}
 #endif // SINGLE_THREADED
 }
@@ -138,12 +142,16 @@ void ThreadManager::Delete()
 {
 	bStop = true;
 #ifndef SINGLE_THREADED
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < hdwConcurrency; i++)
 	{
 		//This isn't safe,
 		//since if the thread isn't joinable the thread will never be joined
-		if(threadPool[i].joinable())
-			threadPool[i].join();
+		if (threadPool[i]->joinable())
+		{
+			threadPool[i]->join();
+			delete threadPool[i];
+			threadPool[i] = nullptr;
+		}
 	}
 #endif // !SINGLE_THREADED
 
@@ -151,6 +159,11 @@ void ThreadManager::Delete()
 	delete lowPriorityQueue;
 
 	delete tmRef;
+}
+
+int ThreadManager::getHdwConcurrency()
+{
+	return hdwConcurrency;
 }
 
 // Doesn't actually work and isn't used, ignore it

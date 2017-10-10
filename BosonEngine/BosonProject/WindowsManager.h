@@ -24,7 +24,7 @@ private:
 	unsigned int height;
 	std::wstring winClassName;
 	std::wstring winTitle;
-	Game game;
+	Game* game;
 
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
