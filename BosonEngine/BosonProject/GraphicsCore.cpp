@@ -26,8 +26,6 @@ GraphicsCore::GraphicsCore(unsigned int width, unsigned int height, HWND hWnd)
 	{
 		defContexts.push_back(nullptr);
 	}
-
-	//memset(&defContexts[0], 0, sizeof(ID3D11DeviceContext*) * size_threads);
 }
 
 
@@ -109,16 +107,6 @@ HRESULT GraphicsCore::InitGraphics()
 	);
 
 	if (FAILED(result)) return result;
-
-	//here for debug purposes
-	//remove when done
-	int test = threadManager->getHdwConcurrency();
-	for (int i = 0; i < test; i++)
-	{
-		result = device->CreateDeferredContext(0, &defContexts[i]);
-		if (FAILED(result)) return result;
-	}
-	//end of remove
 
 	//check support for multithreading
 	D3D11_FEATURE_DATA_THREADING dxThreadSupport;
@@ -264,10 +252,21 @@ void GraphicsCore::loadMeshes(std::wstring folderPath)
 		::FindClose(hFind);
 	}
 
+	for (int i = 0; i < filePaths.size(); i++)
+	{
+		std::wstring name = filePaths[i];
+		std::string nameTemp(name.begin(), name.end());
+		Mesh mesh = loadMesh(nameTemp);
+		//if (mesh == Mesh())
+		//{
+		//	//s
+		//}
+		//add meshes to mesh list
+	}
 
 }
 
-void GraphicsCore::loadMesh(std::string objFile)
+Mesh GraphicsCore::loadMesh(std::string objFile)
 {
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
@@ -280,7 +279,7 @@ void GraphicsCore::loadMesh(std::string objFile)
 
 	// Check for successful open
 	if (!obj.is_open())
-		return;
+		return Mesh();
 
 	// Variables used while reading the file
 	std::vector<DirectX::XMFLOAT3> positions;     // Positions from the file
@@ -446,7 +445,7 @@ void GraphicsCore::loadMesh(std::string objFile)
 	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
 	device->CreateBuffer(&ibd, &initialIndexData, &indexBuffer);
 
-	meshes[objFile] = new Mesh(vertexBuffer, indexBuffer, indices.size());
+	return Mesh(vertexBuffer, indexBuffer, indices.size());
 }
 
 void GraphicsCore::ClearBackAndDepthBuffers()

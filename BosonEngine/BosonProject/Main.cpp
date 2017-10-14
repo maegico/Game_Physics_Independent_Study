@@ -1,4 +1,3 @@
-//#include "stdafx.h"
 #include <Windows.h>
 #include "WindowsManager.h"
 
@@ -15,5 +14,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (result)
 		return 1;
 
-	return win.Run();
+	WPARAM resultRun = win.Run();
+	//return 0 is resultRun does not exist
+	return !(resultRun == 0);
 }

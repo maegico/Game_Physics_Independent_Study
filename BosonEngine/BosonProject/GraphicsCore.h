@@ -7,15 +7,22 @@
 #include <DirectXMath.h>
 #include "Vertex.h"
 #include "ThreadManager.h"
-#include "Mesh.h"
+#include "EntityInterface.h"
 
 //should this be a friend class of WindowsManager????
+
+//Can I have it so that you automatically add something to the renderer when you make a game object
+//Make a game object interface that all game objects inherit from?
+
+//Need a semaphore for the cmdlists
 
 #pragma comment(lib, "d3d11.lib")
 
 class GraphicsCore
 {
 protected:
+	std::unordered_map<std::string, EntityInterface*> objs;
+
 	GraphicsCore();
 	GraphicsCore(unsigned int width, unsigned int height, HWND hWnd);
 	~GraphicsCore();
@@ -29,11 +36,13 @@ protected:
 	virtual void Draw();
 
 	void loadMeshes(std::wstring folderPath);
-	void loadMesh(std::string objFile);
+	Mesh loadMesh(std::string objFile);
 
 	void ClearBackAndDepthBuffers();
-	void QueueEntityDraw();
-	void QueueEntityBatch();	//not implemented yet
+	
+
+	/*void QueueEntityDraw();
+	void QueueEntityBatch();*/
 
 private:
 	unsigned int width;
@@ -52,7 +61,6 @@ private:
 
 	ThreadManager* threadManager;
 
-	std::unordered_map<std::string, Mesh*> meshes;
 	std::vector<ID3D11CommandList*> cmdLists;
 };
 

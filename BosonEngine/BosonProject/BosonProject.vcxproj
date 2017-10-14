@@ -152,6 +152,7 @@
     <ClCompile Include="WindowsManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EntityInterface.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphicsCore.h" />
     <ClInclude Include="Mesh.h" />
