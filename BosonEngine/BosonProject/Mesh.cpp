@@ -6,7 +6,7 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(ID3D11Buffer * vertexBuffer, ID3D11Buffer * indexBuffer, int numIndices)
+Mesh::Mesh(ID3D11Buffer * vertexBuffer, ID3D11Buffer * indexBuffer, size_t numIndices)
 	: vertBuf(vertexBuffer), indexBuf(indexBuffer), numIndices(numIndices)
 {
 }
@@ -26,7 +26,7 @@ ID3D11Buffer * Mesh::GetIndexBuffer()
 	return indexBuf;
 }
 
-int Mesh::GetIndexCount()
+size_t Mesh::GetIndexCount()
 {
 	return numIndices;
 }

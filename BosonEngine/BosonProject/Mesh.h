@@ -5,17 +5,17 @@ class Mesh
 {
 public:
 	Mesh();
-	Mesh(ID3D11Buffer* vertexBuffer, ID3D11Buffer* indexBuffer, int numIndices);
+	Mesh(ID3D11Buffer* vertexBuffer, ID3D11Buffer* indexBuffer, size_t numIndices);
 	~Mesh();
 
 	ID3D11Buffer* GetVertexBuffer();
 	ID3D11Buffer* GetIndexBuffer();
-	int GetIndexCount();
+	size_t GetIndexCount();
 
 private:
 	//pointers to the Vertex Buffer and Index Buffer
 	ID3D11Buffer* vertBuf;
 	ID3D11Buffer* indexBuf;
-	int numIndices;	//used when drawing
+	size_t numIndices;	//used when drawing
 };
 

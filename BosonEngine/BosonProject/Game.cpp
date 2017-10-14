@@ -35,5 +35,4 @@ void Game::Draw()
 void Game::OnResize(unsigned int width, unsigned int height)
 {
 	GraphicsCore::OnResize(width, height);
-
 }

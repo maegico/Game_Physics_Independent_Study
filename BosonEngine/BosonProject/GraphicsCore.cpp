@@ -1,7 +1,5 @@
 #include "GraphicsCore.h"
 
-
-
 GraphicsCore::GraphicsCore()
 {
 }
@@ -36,8 +34,8 @@ GraphicsCore::~GraphicsCore()
 
 	if (swapChain) { swapChain->Release(); }
 
-	int numDefContexts = defContexts.size();
-	for (int i = 0; i < numDefContexts; i++)
+	size_t numDefContexts = defContexts.size();
+	for (size_t i = 0; i < numDefContexts; i++)
 	{
 		if (defContexts[i])
 		{
@@ -409,7 +407,7 @@ Mesh GraphicsCore::loadMesh(std::string objFile)
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * verts.size();       // 3 = number of vertices in the buffer
+	vbd.ByteWidth = sizeof(Vertex) * (UINT)verts.size();       // 3 = number of vertices in the buffer
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // Tells DirectX this is a vertex buffer
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
@@ -430,7 +428,7 @@ Mesh GraphicsCore::loadMesh(std::string objFile)
 	//    it to create the buffer.  The description is then useless.
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(uint32_t) * indices.size();         // 3 = number of indices in the buffer
+	ibd.ByteWidth = sizeof(uint32_t) * (UINT)indices.size();         // 3 = number of indices in the buffer
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER; // Tells DirectX this is an index buffer
 	ibd.CPUAccessFlags = 0;
 	ibd.MiscFlags = 0;

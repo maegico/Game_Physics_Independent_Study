@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasicEntity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GraphicsCore.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -152,13 +153,16 @@
     <ClCompile Include="WindowsManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicEntity.h" />
     <ClInclude Include="EntityInterface.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphicsCore.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="ThreadQueue.h" />
     <ClInclude Include="ThreadTesting.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowsManager.h" />
   </ItemGroup>
