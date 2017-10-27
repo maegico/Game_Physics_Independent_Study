@@ -22,7 +22,7 @@
     <ProjectGuid>{974EBF3D-B66C-4523-85D7-0E0278ED4B57}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>BosonProject</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -148,8 +148,10 @@
     <ClCompile Include="GraphicsCore.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="ThreadManager.cpp" />
     <ClCompile Include="ThreadQueue.cpp" />
+    <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WindowsManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -158,12 +160,14 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphicsCore.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="ThreadQueue.h" />
     <ClInclude Include="ThreadTesting.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="VertexShader.h" />
     <ClInclude Include="WindowsManager.h" />
   </ItemGroup>
   <ItemGroup>

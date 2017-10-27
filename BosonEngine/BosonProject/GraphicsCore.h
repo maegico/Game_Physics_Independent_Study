@@ -53,14 +53,14 @@ private:
 	IDXGISwapChain* swapChain;
 	ID3D11Device* device;
 	ID3D11DeviceContext* immContext;
-	std::vector<ID3D11DeviceContext*> defContexts;
+	//std::vector<ID3D11DeviceContext*> defContexts;
 	//ID3D11CommandList* cmdLists[7];
 
 	ID3D11RenderTargetView* backBuffer;
 	ID3D11DepthStencilView* depthStencilView;
 
-	ThreadManager* threadManager;
+	//ThreadManager* threadManager;
 
-	std::vector<ID3D11CommandList*> cmdLists;
+	//std::vector<ID3D11CommandList*> cmdLists;
 };
 

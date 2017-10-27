@@ -16,14 +16,14 @@ GraphicsCore::GraphicsCore(unsigned int width, unsigned int height, HWND hWnd)
 	depthStencilView = nullptr;
 
 	//Create the thread system here
-	threadManager = ThreadManager::GetThreadManager();
+	/*threadManager = ThreadManager::GetThreadManager();
 	size_threads = threadManager->getHdwConcurrency();
 	
 	defContexts.reserve(size_threads);
 	for (int i = 0; i < size_threads; i++)
 	{
 		defContexts.push_back(nullptr);
-	}
+	}*/
 }
 
 
@@ -34,7 +34,7 @@ GraphicsCore::~GraphicsCore()
 
 	if (swapChain) { swapChain->Release(); }
 
-	size_t numDefContexts = defContexts.size();
+	/*size_t numDefContexts = defContexts.size();
 	for (size_t i = 0; i < numDefContexts; i++)
 	{
 		if (defContexts[i])
@@ -44,7 +44,7 @@ GraphicsCore::~GraphicsCore()
 		}
 	}
 
-	threadManager->Delete();
+	threadManager->Delete();*/
 
 	if (immContext) { immContext->Release(); }
 	if (device) { device->Release(); }
@@ -52,7 +52,7 @@ GraphicsCore::~GraphicsCore()
 	depthStencilView = nullptr;
 	backBuffer = nullptr;
 	swapChain = nullptr;
-	threadManager = nullptr;
+	//threadManager = nullptr;
 	immContext = nullptr;
 	device = nullptr;
 }
@@ -107,11 +107,11 @@ HRESULT GraphicsCore::InitGraphics()
 	if (FAILED(result)) return result;
 
 	//check support for multithreading
-	D3D11_FEATURE_DATA_THREADING dxThreadSupport;
+	/*D3D11_FEATURE_DATA_THREADING dxThreadSupport;
 	unsigned int dxThreadSupportSize = sizeof(D3D11_FEATURE_DATA_THREADING);
-	ZeroMemory(&dxThreadSupport, dxThreadSupportSize);
+	ZeroMemory(&dxThreadSupport, dxThreadSupportSize);*/
 
-	result = device->CheckFeatureSupport(D3D11_FEATURE_THREADING, &dxThreadSupport, dxThreadSupportSize);
+	/*result = device->CheckFeatureSupport(D3D11_FEATURE_THREADING, &dxThreadSupport, dxThreadSupportSize);
 	if (FAILED(result)) return result;
 
 	if (dxThreadSupport.DriverConcurrentCreates == FALSE || dxThreadSupport.DriverCommandLists == FALSE)
@@ -122,7 +122,7 @@ HRESULT GraphicsCore::InitGraphics()
 	{
 		result = device->CreateDeferredContext(0, &defContexts[i]);
 		if (FAILED(result)) return result;
-	}
+	}*/
 	
 	ID3D11Texture2D* backBufferTexture;
 	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture);
