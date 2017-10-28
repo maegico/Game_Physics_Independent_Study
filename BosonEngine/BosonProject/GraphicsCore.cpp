@@ -250,7 +250,7 @@ void GraphicsCore::loadMeshes(std::wstring folderPath)
 		::FindClose(hFind);
 	}
 
-	for (int i = 0; i < filePaths.size(); i++)
+	for (size_t i = 0; i < filePaths.size(); i++)
 	{
 		std::wstring name = filePaths[i];
 		std::string nameTemp(name.begin(), name.end());

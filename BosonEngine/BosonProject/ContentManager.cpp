@@ -1,5 +1,4 @@
 #include "ContentManager.h"
-#include <cstdarg>
 
 using namespace std;
 
@@ -27,7 +26,10 @@ ContentManager::~ContentManager()
 	for (auto i = m_textures.begin(); i != m_textures.end(); i++)
 	{
 		if (i->second != nullptr)
-			i->second->Release();
+		{
+			i->second->getTexture()->Release();
+			//i->second->Release();
+		}
 	}
 	for (auto i = m_vshaders.begin(); i != m_vshaders.end(); i++)
 	{
@@ -39,9 +41,6 @@ ContentManager::~ContentManager()
 		if (i->second != nullptr)
 			delete i->second;
 	}
-	
-	m_context->Release();
-	m_device->Release();
 }
 
 void ContentManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
@@ -49,24 +48,16 @@ void ContentManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 	device->AddRef();
 	context->AddRef();
 
-	m_device = device;
-	m_context = context;
-
 	m_materials = std::unordered_map<std::string, Material*>();
 	m_meshes = std::unordered_map<std::string, Mesh*>();
 	m_samplers = std::unordered_map<std::string, ID3D11SamplerState*>();
-	m_vshaders = std::unordered_map<std::string, SimpleVertexShader*>();
-	m_pshaders = std::unordered_map<std::string, SimplePixelShader*>();
-	m_textures = std::unordered_map<std::string, ID3D11ShaderResourceView*>();
-	m_cubemaps = std::unordered_map<std::string, ID3D11ShaderResourceView*>();
-	
+	m_vshaders = std::unordered_map<std::string, VertexShader*>();
+	m_pshaders = std::unordered_map<std::string, PixelShader*>();
+	m_textures = std::unordered_map<std::string, Texture*>();
+	//m_cubemaps = std::unordered_map<std::string, ID3D11ShaderResourceView*>();
 
-	//below is placed on the stack, since I won't need them after this
-	//below here is probably where I will probe the files for the needed info
-	//the below isn't so terrible anymore, but still
-	//these make sense though since we will go through all the files in a file location and grab all there names saving them inside the below vectors and more vectors
-	std::vector<std::wstring>	vshaders;	//see if I can change this <- this is going to be terrible
-	std::vector<std::wstring>	pshaders;	//see if I can change this <- this is going to be terrible
+	std::vector<std::wstring>	vshaders;
+	std::vector<std::wstring>	pshaders;
 	std::vector<std::wstring>	textures;
 	std::vector<std::wstring>	cubemaps;
 	std::vector<std::string>	models;
@@ -77,68 +68,43 @@ void ContentManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 	FindFilesInFolderWSTR(L"Assets/CubeMaps", cubemaps);
 	FindFilesInFolder(L"Assets/Models", models);
 
-	CreateSamplers("sampler");
+	CreateSamplers("sampler", device);
 
-	//The below isn't creating the shaders correctly
-	for (int i = 0; i < vshaders.size(); i++)
+	for (size_t i = 0; i < vshaders.size(); i++)
 	{
-		CreateVShader(vshaders[i]);
+		CreateVShader(vshaders[i], device);
 	}
-	for (int i = 0; i < pshaders.size(); i++)
+	for (size_t i = 0; i < pshaders.size(); i++)
 	{
-		CreatePShader(pshaders[i]);
+		CreatePShader(pshaders[i], device);
 	}
-	for (int i = 0; i < textures.size(); i++)
+	for (size_t i = 0; i < textures.size(); i++)
 	{
-		CreateTexture(textures[i]);
+		CreateTexture(textures[i], device, context);
 	}
-	for (int i = 0; i < cubemaps.size(); i++)
+	for (size_t i = 0; i < cubemaps.size(); i++)
 	{
-		CreateCubeMap(cubemaps[i]);
+		CreateCubeMap(cubemaps[i], device);
 	}
-	for (int i = 0; i < models.size(); i++)
+	for (size_t i = 0; i < models.size(); i++)
 	{
-		CreateMesh(models[i]);
+		CreateMesh(models[i], device);
 	}
+
+	context->Release();
+	device->Release();
 }
 
-//Should I hold a bunch of textures in CM or create on construction of a material
-Material* ContentManager::LoadMaterialWithNormalMap(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName, std::string normalMapName)
+Material* ContentManager::LoadMaterial(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName)
 {
 	Material* mat;
-	SimpleVertexShader* vshader = m_vshaders[vs];
-	SimplePixelShader* pshader = m_pshaders[ps];
+	VertexShader* vshader = m_vshaders[vs];
+	PixelShader* pshader = m_pshaders[ps];
 	ID3D11SamplerState*  sampler = m_samplers[samplerName];
-	ID3D11ShaderResourceView* texture = m_textures[textureName];
-	ID3D11ShaderResourceView* normalMap = m_textures[normalMapName];
+	Texture* texture = m_textures[textureName];
+	//ID3D11ShaderResourceView* normalMap = m_textures[normalMapName];
 
-	mat = new Material(vshader, pshader, texture, normalMap, sampler);
-	m_materials[name] = mat;
-	return mat;
-}
-
-Material * ContentManager::LoadCubeMapMaterial(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName)
-{
-	Material* mat;
-	SimpleVertexShader* vshader = m_vshaders[vs];
-	SimplePixelShader* pshader = m_pshaders[ps];
-	ID3D11SamplerState*  sampler = m_samplers[samplerName];
-	ID3D11ShaderResourceView* texture = m_cubemaps[textureName];
-
-	mat = new Material(vshader, pshader, texture, nullptr, sampler);
-	m_materials[name] = mat;
-
-	return mat;
-}
-
-Material * ContentManager::LoadPostProcessingMaterial(std::string name, std::string samplerName, std::string vs, std::string ps)
-{
-	Material* mat;
-	SimpleVertexShader* vshader = m_vshaders[vs];
-	SimplePixelShader* pshader = m_pshaders[ps];
-	ID3D11SamplerState*  sampler = m_samplers[samplerName];
-
-	mat = new Material(vshader, pshader, nullptr, nullptr, sampler);
+	mat = new Material(vshader, pshader, sampler, texture, 1);
 	m_materials[name] = mat;
 	return mat;
 }
@@ -154,81 +120,81 @@ Material * ContentManager::GetMaterial(std::string name)
 }
 
 //took from Chris Cascioli's code
-void ContentManager::CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices)
-{
-	// Reset tangents
-	for (int i = 0; i < numVerts; i++)
-	{
-		verts[i].Tangent = DirectX::XMFLOAT3(0, 0, 0);
-	}
+//void ContentManager::CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices)
+//{
+//	// Reset tangents
+//	for (int i = 0; i < numVerts; i++)
+//	{
+//		verts[i].Tangent = DirectX::XMFLOAT3(0, 0, 0);
+//	}
+//
+//	// Calculate tangents one whole triangle at a time
+//	for (int i = 0; i < numVerts;)
+//	{
+//		// Grab indices and vertices of first triangle
+//		unsigned int i1 = indices[i++];
+//		unsigned int i2 = indices[i++];
+//		unsigned int i3 = indices[i++];
+//		Vertex* v1 = &verts[i1];
+//		Vertex* v2 = &verts[i2];
+//		Vertex* v3 = &verts[i3];
+//
+//		// Calculate vectors relative to triangle positions
+//		float x1 = v2->Position.x - v1->Position.x;
+//		float y1 = v2->Position.y - v1->Position.y;
+//		float z1 = v2->Position.z - v1->Position.z;
+//
+//		float x2 = v3->Position.x - v1->Position.x;
+//		float y2 = v3->Position.y - v1->Position.y;
+//		float z2 = v3->Position.z - v1->Position.z;
+//
+//		// Do the same for vectors relative to triangle uv's
+//		float s1 = v2->UV.x - v1->UV.x;
+//		float t1 = v2->UV.y - v1->UV.y;
+//
+//		float s2 = v3->UV.x - v1->UV.x;
+//		float t2 = v3->UV.y - v1->UV.y;
+//
+//		// Create vectors for tangent calculation
+//		float r = 1.0f / (s1 * t2 - s2 * t1);
+//
+//		float tx = (t2 * x1 - t1 * x2) * r;
+//		float ty = (t2 * y1 - t1 * y2) * r;
+//		float tz = (t2 * z1 - t1 * z2) * r;
+//
+//		// Adjust tangents of each vert of the triangle
+//		v1->Tangent.x += tx;
+//		v1->Tangent.y += ty;
+//		v1->Tangent.z += tz;
+//
+//		v2->Tangent.x += tx;
+//		v2->Tangent.y += ty;
+//		v2->Tangent.z += tz;
+//
+//		v3->Tangent.x += tx;
+//		v3->Tangent.y += ty;
+//		v3->Tangent.z += tz;
+//	}
+//
+//	// Ensure all of the tangents are orthogonal to the normals
+//	for (int i = 0; i < numVerts; i++)
+//	{
+//		// Grab the two vectors
+//		DirectX::XMVECTOR normal = XMLoadFloat3(&verts[i].Normal);
+//		DirectX::XMVECTOR tangent = XMLoadFloat3(&verts[i].Tangent);
+//
+//		//DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(tangent1, DirectX::XMVectorMultiply(normal1, DirectX::XMVector3Dot(normal1, tangent1))));
+//
+//		// Use Gram-Schmidt orthogonalize
+//		tangent = DirectX::XMVector3Normalize(
+//			DirectX::XMVectorSubtract(tangent, DirectX::XMVectorMultiply(normal, DirectX::XMVector3Dot(normal, tangent))));
+//
+//		// Store the tangent
+//		DirectX::XMStoreFloat3(&verts[i].Tangent, tangent);
+//	}
+//}
 
-	// Calculate tangents one whole triangle at a time
-	for (int i = 0; i < numVerts;)
-	{
-		// Grab indices and vertices of first triangle
-		unsigned int i1 = indices[i++];
-		unsigned int i2 = indices[i++];
-		unsigned int i3 = indices[i++];
-		Vertex* v1 = &verts[i1];
-		Vertex* v2 = &verts[i2];
-		Vertex* v3 = &verts[i3];
-
-		// Calculate vectors relative to triangle positions
-		float x1 = v2->Position.x - v1->Position.x;
-		float y1 = v2->Position.y - v1->Position.y;
-		float z1 = v2->Position.z - v1->Position.z;
-
-		float x2 = v3->Position.x - v1->Position.x;
-		float y2 = v3->Position.y - v1->Position.y;
-		float z2 = v3->Position.z - v1->Position.z;
-
-		// Do the same for vectors relative to triangle uv's
-		float s1 = v2->UV.x - v1->UV.x;
-		float t1 = v2->UV.y - v1->UV.y;
-
-		float s2 = v3->UV.x - v1->UV.x;
-		float t2 = v3->UV.y - v1->UV.y;
-
-		// Create vectors for tangent calculation
-		float r = 1.0f / (s1 * t2 - s2 * t1);
-
-		float tx = (t2 * x1 - t1 * x2) * r;
-		float ty = (t2 * y1 - t1 * y2) * r;
-		float tz = (t2 * z1 - t1 * z2) * r;
-
-		// Adjust tangents of each vert of the triangle
-		v1->Tangent.x += tx;
-		v1->Tangent.y += ty;
-		v1->Tangent.z += tz;
-
-		v2->Tangent.x += tx;
-		v2->Tangent.y += ty;
-		v2->Tangent.z += tz;
-
-		v3->Tangent.x += tx;
-		v3->Tangent.y += ty;
-		v3->Tangent.z += tz;
-	}
-
-	// Ensure all of the tangents are orthogonal to the normals
-	for (int i = 0; i < numVerts; i++)
-	{
-		// Grab the two vectors
-		DirectX::XMVECTOR normal = XMLoadFloat3(&verts[i].Normal);
-		DirectX::XMVECTOR tangent = XMLoadFloat3(&verts[i].Tangent);
-
-		//DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(tangent1, DirectX::XMVectorMultiply(normal1, DirectX::XMVector3Dot(normal1, tangent1))));
-
-		// Use Gram-Schmidt orthogonalize
-		tangent = DirectX::XMVector3Normalize(
-			DirectX::XMVectorSubtract(tangent, DirectX::XMVectorMultiply(normal, DirectX::XMVector3Dot(normal, tangent))));
-
-		// Store the tangent
-		DirectX::XMStoreFloat3(&verts[i].Tangent, tangent);
-	}
-}
-
-void ContentManager::CreateMesh(std::string objFile)
+void ContentManager::CreateMesh(std::string objFile, ID3D11Device* device)
 {
 	std::string releasePath = "Assets/Models/";
 	releasePath = releasePath + objFile;
@@ -368,12 +334,56 @@ void ContentManager::CreateMesh(std::string objFile)
 	// Close the file and create the actual buffers
 	obj.close();
 
-	CalculateTangents(&verts[0], verts.size(), &indices[0], indices.size());
+	//CalculateTangents(&verts[0], verts.size(), &indices[0], indices.size());
 	
-	m_meshes[objFile] = new Mesh(&verts[0], &indices[0], verts.size(), indices.size(), m_device);
+	//right here we need to create the vertex buffer and the index buffer
+
+	ID3D11Buffer* vertBuf;
+	ID3D11Buffer* indexBuf;
+
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(Vertex) * verts.size();       // 3 = number of vertices in the buffer
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // Tells DirectX this is a vertex buffer
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	vbd.StructureByteStride = 0;
+
+	// Create the proper struct to hold the initial vertex data
+	// - This is how we put the initial data into the buffer
+	D3D11_SUBRESOURCE_DATA initialVertexData;
+	initialVertexData.pSysMem = &verts[0];
+
+	// Actually create the buffer with the initial data
+	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
+	device->CreateBuffer(&vbd, &initialVertexData, &vertBuf);
+
+
+	// Create the INDEX BUFFER description ------------------------------------
+	// - The description is created on the stack because we only need
+	//    it to create the buffer.  The description is then useless.
+	D3D11_BUFFER_DESC ibd;
+	ibd.Usage = D3D11_USAGE_IMMUTABLE;
+	ibd.ByteWidth = sizeof(uint32_t) * indices.size();         // 3 = number of indices in the buffer
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER; // Tells DirectX this is an index buffer
+	ibd.CPUAccessFlags = 0;
+	ibd.MiscFlags = 0;
+	ibd.StructureByteStride = 0;
+
+	// Create the proper struct to hold the initial index data
+	// - This is how we put the initial data into the buffer
+	D3D11_SUBRESOURCE_DATA initialIndexData;
+	initialIndexData.pSysMem = &indices[0];
+
+	// Actually create the buffer with the initial data
+	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
+	device->CreateBuffer(&ibd, &initialIndexData, &indexBuf);
+
+	m_meshes[objFile] = new Mesh(vertBuf, indexBuf, indices.size());
+	//m_meshes[objFile] = new Mesh(&verts[0], &indices[0], verts.size(), indices.size(), device);
 }
 
-void ContentManager::CreateSamplers(std::string name)
+void ContentManager::CreateSamplers(std::string name, ID3D11Device* device)
 {
 	ID3D11SamplerState*  sampler;
 
@@ -388,14 +398,14 @@ void ContentManager::CreateSamplers(std::string name)
 															//MaxLOD
 	samplerDes.MaxLOD = D3D11_FLOAT32_MAX;
 
-	HRESULT result = m_device->CreateSamplerState(&samplerDes, &sampler);
+	HRESULT result = device->CreateSamplerState(&samplerDes, &sampler);
 	if (result != S_OK)
 		printf("ERROR: Failed to create Sampler State.");
 	else
 		m_samplers[name] = sampler;
 }
 
-void ContentManager::CreateTexture(std::wstring textureName)
+void ContentManager::CreateTexture(std::wstring textureName, ID3D11Device* device, ID3D11DeviceContext* context)
 {
 	std::wstring releasePath = L"Debug/Assets/Textures/";
 	releasePath = releasePath + textureName;
@@ -403,28 +413,28 @@ void ContentManager::CreateTexture(std::wstring textureName)
 
 	ID3D11ShaderResourceView* texture;
 
-	HRESULT result = DirectX::CreateWICTextureFromFile(m_device, m_context, debugPath.c_str(), 0, &texture);
+	HRESULT result = DirectX::CreateWICTextureFromFile(device, context, debugPath.c_str(), 0, &texture);
 	if (result != S_OK)
 		printf("ERROR: Failed to Load Texture.");
+
 	std::string name(textureName.begin(), textureName.end());
-	m_textures[name] = texture;
+	m_textures[name] = new Texture(texture, Texture2D);
 }
 
-void ContentManager::CreateCubeMap(std::wstring cubeName)
+void ContentManager::CreateCubeMap(std::wstring cubeName, ID3D11Device* device)
 {
 	std::wstring debugPath = L"Assets/CubeMaps/";
 	debugPath += cubeName;
 
 	ID3D11ShaderResourceView* cubemap;
-
-	DirectX::CreateDDSTextureFromFile(m_device, debugPath.c_str(), 0, &cubemap);
+	DirectX::CreateDDSTextureFromFile(device, debugPath.c_str(), 0, &cubemap);
 
 	std::string name(cubeName.begin(), cubeName.end());
-	m_cubemaps[name] = cubemap;
+	m_textures[name] = new Texture(cubemap, TextureType::CubeMap);
 }
 
 //Compiles .cso's where the .hlsl file is
-void ContentManager::CreateVShader(std::wstring shader)
+void ContentManager::CreateVShader(std::wstring shader, ID3D11Device* device)
 {
 	std::wstring compiledName = shader.substr(0, shader.length() - 4);
 	compiledName += L"cso";
@@ -439,26 +449,15 @@ void ContentManager::CreateVShader(std::wstring shader)
 	//wchar_t* projDirFilePath = wcsncat(begin, shader, len+1);
 	//Want to figure the above out!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <- !!!!
 
-	SimpleVertexShader* vertexShader = new SimpleVertexShader(m_device, m_context);
+	/*SimpleVertexShader* vertexShader = new SimpleVertexShader(m_device, m_context);
 	if (!vertexShader->LoadShaderFile(releasePath.c_str()))
-		vertexShader->LoadShaderFile(debugPath.c_str());
-
-	// You'll notice that the code above attempts to load each
-	// compiled shader file (.cso) from two different relative paths.
-
-	// This is because the "working directory" (where relative paths begin)
-	// will be different during the following two scenarios:
-	//  - Debugging in VS: The "Project Directory" (where your .cpp files are) 
-	//  - Run .exe directly: The "Output Directory" (where the .exe & .cso files are)
-
-	// Checking both paths is the easiest way to ensure both 
-	// scenarios work correctly, although others exist
+		vertexShader->LoadShaderFile(debugPath.c_str());*/
 
 	std::string name(compiledName.begin(), compiledName.end());
 	m_vshaders[name] = vertexShader;
 }
 
-void ContentManager::CreatePShader(std::wstring shader)
+void ContentManager::CreatePShader(std::wstring shader, ID3D11Device* device)
 {
 	std::wstring compiledName = shader.substr(0, shader.length() - 4);
 	compiledName += L"cso";
@@ -467,20 +466,9 @@ void ContentManager::CreatePShader(std::wstring shader)
 
 	std::wstring debugPath = L"Assets/VShaders/" + compiledName;
 
-	SimplePixelShader* pixelShader = new SimplePixelShader(m_device, m_context);
+	/*SimplePixelShader* pixelShader = new SimplePixelShader(m_device, m_context);
 	if (!pixelShader->LoadShaderFile(releasePath.c_str()))
-		pixelShader->LoadShaderFile(compiledName.c_str());
-
-	// You'll notice that the code above attempts to load each
-	// compiled shader file (.cso) from two different relative paths.
-
-	// This is because the "working directory" (where relative paths begin)
-	// will be different during the following two scenarios:
-	//  - Debugging in VS: The "Project Directory" (where your .cpp files are) 
-	//  - Run .exe directly: The "Output Directory" (where the .exe & .cso files are)
-
-	// Checking both paths is the easiest way to ensure both 
-	// scenarios work correctly, although others exist
+		pixelShader->LoadShaderFile(compiledName.c_str());*/
 
 	std::string shaderString(compiledName.begin(), compiledName.end());
 	m_pshaders[shaderString] = pixelShader;
