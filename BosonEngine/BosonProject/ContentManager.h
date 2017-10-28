@@ -6,11 +6,13 @@
 #include <memory>
 #include <Windows.h>
 #include <d3d11.h>
+
 #include <WICTextureLoader.h>
 #include "DDSTextureLoader.h"
 
-#include "Shaders.h"
-#include "SimpleShader.h"
+#include "VertexShader.h"
+#include "PixelShader.h"
+//#include "SimpleShader.h"
 #include "Vertex.h"
 #include "Material.h"
 #include "Mesh.h"
