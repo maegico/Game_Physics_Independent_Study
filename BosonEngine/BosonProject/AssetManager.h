@@ -4,6 +4,7 @@
 #include <fstream>
 #include <Windows.h>
 #include <d3d11.h>
+#include <d3dcompiler.h>
 #include <WICTextureLoader.h>
 #include <DDSTextureLoader.h>
 
@@ -13,16 +14,19 @@
 #include "Vertex.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "Debug.h"
 
-class ContentManager
+#pragma comment(lib, "d3dcompiler.lib")
+
+class AssetManager
 {
 	//handle model, texture, and shader loading
 	//http://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
 		//used second solution
 public:
 	//default constructor (Don't Use)
-	ContentManager();
-	~ContentManager();
+	AssetManager();
+	~AssetManager();
 
 	void Init(ID3D11Device* device, ID3D11DeviceContext* context);
 

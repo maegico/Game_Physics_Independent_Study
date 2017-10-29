@@ -1,12 +1,12 @@
-#include "ContentManager.h"
+#include "AssetManager.h"
 
 using namespace std;
 
-ContentManager::ContentManager()
+AssetManager::AssetManager()
 {
 }
 
-ContentManager::~ContentManager()
+AssetManager::~AssetManager()
 {
 	for (auto i = m_meshes.begin(); i != m_meshes.end(); i++)
 	{
@@ -43,7 +43,7 @@ ContentManager::~ContentManager()
 	}
 }
 
-void ContentManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
+void AssetManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 {
 	device->AddRef();
 	context->AddRef();
@@ -95,7 +95,7 @@ void ContentManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 	device->Release();
 }
 
-Material* ContentManager::LoadMaterial(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName)
+Material* AssetManager::LoadMaterial(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName)
 {
 	Material* mat;
 	VertexShader* vshader = m_vshaders[vs];
@@ -109,18 +109,18 @@ Material* ContentManager::LoadMaterial(std::string name, std::string samplerName
 	return mat;
 }
 
-Mesh* ContentManager::GetMesh(std::string mesh)
+Mesh* AssetManager::GetMesh(std::string mesh)
 {
 	return m_meshes[mesh];
 }
 
-Material * ContentManager::GetMaterial(std::string name)
+Material * AssetManager::GetMaterial(std::string name)
 {
 	return m_materials[name];
 }
 
 //took from Chris Cascioli's code
-//void ContentManager::CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices)
+//void AssetManager::CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices)
 //{
 //	// Reset tangents
 //	for (int i = 0; i < numVerts; i++)
@@ -194,7 +194,7 @@ Material * ContentManager::GetMaterial(std::string name)
 //	}
 //}
 
-void ContentManager::CreateMesh(std::string objFile, ID3D11Device* device)
+void AssetManager::CreateMesh(std::string objFile, ID3D11Device* device)
 {
 	std::string releasePath = "Assets/Models/";
 	releasePath = releasePath + objFile;
@@ -343,7 +343,7 @@ void ContentManager::CreateMesh(std::string objFile, ID3D11Device* device)
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * verts.size();       // 3 = number of vertices in the buffer
+	vbd.ByteWidth = (UINT)(sizeof(Vertex) * verts.size());       // 3 = number of vertices in the buffer
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // Tells DirectX this is a vertex buffer
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
@@ -364,7 +364,7 @@ void ContentManager::CreateMesh(std::string objFile, ID3D11Device* device)
 	//    it to create the buffer.  The description is then useless.
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(uint32_t) * indices.size();         // 3 = number of indices in the buffer
+	ibd.ByteWidth = (UINT)(sizeof(uint32_t) * indices.size());
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER; // Tells DirectX this is an index buffer
 	ibd.CPUAccessFlags = 0;
 	ibd.MiscFlags = 0;
@@ -383,7 +383,7 @@ void ContentManager::CreateMesh(std::string objFile, ID3D11Device* device)
 	//m_meshes[objFile] = new Mesh(&verts[0], &indices[0], verts.size(), indices.size(), device);
 }
 
-void ContentManager::CreateSamplers(std::string name, ID3D11Device* device)
+void AssetManager::CreateSamplers(std::string name, ID3D11Device* device)
 {
 	ID3D11SamplerState*  sampler;
 
@@ -405,7 +405,7 @@ void ContentManager::CreateSamplers(std::string name, ID3D11Device* device)
 		m_samplers[name] = sampler;
 }
 
-void ContentManager::CreateTexture(std::wstring textureName, ID3D11Device* device, ID3D11DeviceContext* context)
+void AssetManager::CreateTexture(std::wstring textureName, ID3D11Device* device, ID3D11DeviceContext* context)
 {
 	std::wstring releasePath = L"Debug/Assets/Textures/";
 	releasePath = releasePath + textureName;
@@ -421,7 +421,7 @@ void ContentManager::CreateTexture(std::wstring textureName, ID3D11Device* devic
 	m_textures[name] = new Texture(texture, Texture2D);
 }
 
-void ContentManager::CreateCubeMap(std::wstring cubeName, ID3D11Device* device)
+void AssetManager::CreateCubeMap(std::wstring cubeName, ID3D11Device* device)
 {
 	std::wstring debugPath = L"Assets/CubeMaps/";
 	debugPath += cubeName;
@@ -434,7 +434,7 @@ void ContentManager::CreateCubeMap(std::wstring cubeName, ID3D11Device* device)
 }
 
 //Compiles .cso's where the .hlsl file is
-void ContentManager::CreateVShader(std::wstring shader, ID3D11Device* device)
+void AssetManager::CreateVShader(std::wstring shader, ID3D11Device* device)
 {
 	std::wstring compiledName = shader.substr(0, shader.length() - 4);
 	compiledName += L"cso";
@@ -442,22 +442,47 @@ void ContentManager::CreateVShader(std::wstring shader, ID3D11Device* device)
 	releasePath = releasePath + compiledName;
 
 	std::wstring debugPath = L"Assets/VShaders/" + compiledName;
-	//std::wstring debugPath = compiledName;
 
-	//wchar_t begin[] = L"Debug/\0";
-	//size_t len = wcslen(shader);
-	//wchar_t* projDirFilePath = wcsncat(begin, shader, len+1);
-	//Want to figure the above out!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <- !!!!
+	ID3DBlob* shaderBlob;
+	ID3D11VertexShader* vshader;
+	ID3D11InputLayout* layout;
 
-	/*SimpleVertexShader* vertexShader = new SimpleVertexShader(m_device, m_context);
-	if (!vertexShader->LoadShaderFile(releasePath.c_str()))
-		vertexShader->LoadShaderFile(debugPath.c_str());*/
+	HRESULT hr = D3DReadFileToBlob(releasePath.c_str(), &shaderBlob);
+	if (hr != S_OK)
+		hr = D3DReadFileToBlob(debugPath.c_str(), &shaderBlob);
+	if (hr != S_OK)
+	{
+		Debug::Log("Failed to open/read Vertex Shader file", LogType::Error);
+		return;
+	}
 
+	hr = device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), 0, &vshader);
+	if (hr != S_OK)
+	{
+		Debug::Log("Failed to create Vertex Shader", LogType::Error);
+		return;
+	}
+	//context->VSSetShader(vshader, 0, 0);
+
+	D3D11_INPUT_ELEMENT_DESC ied[] =
+	{
+		{ "POSITION",0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+
+	hr = device->CreateInputLayout(&ied[0], 2, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &layout);
+	if (hr != S_OK)
+	{
+		Debug::Log("Failed to create input layout", LogType::Error);
+		return;
+	}
+
+	//context->IASetInputLayout(layout);
+	shaderBlob->Release();
 	std::string name(compiledName.begin(), compiledName.end());
-	m_vshaders[name] = vertexShader;
+	m_vshaders[name] = new VertexShader(vshader, layout);
 }
 
-void ContentManager::CreatePShader(std::wstring shader, ID3D11Device* device)
+void AssetManager::CreatePShader(std::wstring shader, ID3D11Device* device)
 {
 	std::wstring compiledName = shader.substr(0, shader.length() - 4);
 	compiledName += L"cso";
@@ -466,19 +491,36 @@ void ContentManager::CreatePShader(std::wstring shader, ID3D11Device* device)
 
 	std::wstring debugPath = L"Assets/VShaders/" + compiledName;
 
-	/*SimplePixelShader* pixelShader = new SimplePixelShader(m_device, m_context);
-	if (!pixelShader->LoadShaderFile(releasePath.c_str()))
-		pixelShader->LoadShaderFile(compiledName.c_str());*/
+	ID3DBlob* shaderBlob;
+	ID3D11PixelShader* pshader;
 
+	HRESULT hr = D3DReadFileToBlob(releasePath.c_str(), &shaderBlob);
+	if (hr != S_OK)
+		hr = D3DReadFileToBlob(debugPath.c_str(), &shaderBlob);
+	if (hr != S_OK)
+	{
+		Debug::Log("Failed to open/read Pixel Shader file", LogType::Error);
+		return;
+	}
+
+	hr = device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), 0, &pshader);
+	if (hr != S_OK)
+	{
+		Debug::Log("Failed to create Pixel Shader file", LogType::Error);
+		return;
+	}
+
+	//context->PSSetShader(pshader, 0, 0);
+	shaderBlob->Release();
 	std::string shaderString(compiledName.begin(), compiledName.end());
-	m_pshaders[shaderString] = pixelShader;
+	m_pshaders[shaderString] = new PixelShader(pshader);
 }
 
 //I could make the below better, by
 
 //I took the basic code from below and modified it to work for both UNICODE and non-UNICODE character sets
 //Got it from: http://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
-void ContentManager::FindFilesInFolder(std::wstring folder, std::vector<std::string>& listOfFiles)
+void AssetManager::FindFilesInFolder(std::wstring folder, std::vector<std::string>& listOfFiles)
 {
 #ifdef UNICODE
 	std::wstring path = folder + L"/*.*";
@@ -523,7 +565,7 @@ void ContentManager::FindFilesInFolder(std::wstring folder, std::vector<std::str
 
 //I didn't code this
 //Got it from: http://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
-void ContentManager::FindFilesInFolderWSTR(std::wstring folder, std::vector<std::wstring>& listOfFiles)
+void AssetManager::FindFilesInFolderWSTR(std::wstring folder, std::vector<std::wstring>& listOfFiles)
 {
 #ifdef UNICODE
 	std::wstring path = folder + L"/*.*";

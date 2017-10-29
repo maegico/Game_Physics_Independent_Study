@@ -8,13 +8,7 @@
 #include "Vertex.h"
 #include "ThreadManager.h"
 #include "EntityInterface.h"
-
-//should this be a friend class of WindowsManager????
-
-//Can I have it so that you automatically add something to the renderer when you make a game object
-//Make a game object interface that all game objects inherit from?
-
-//Need a semaphore for the cmdlists
+#include "AssetManager.h"
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -34,9 +28,6 @@ protected:
 	virtual HRESULT Init() = 0;
 	virtual void Update() = 0;
 	virtual void Draw();
-
-	void loadMeshes(std::wstring folderPath);
-	Mesh loadMesh(std::string objFile);
 
 	void ClearBackAndDepthBuffers();
 	
@@ -62,5 +53,6 @@ private:
 	//ThreadManager* threadManager;
 
 	//std::vector<ID3D11CommandList*> cmdLists;
+	AssetManager assetManager;
 };
 
