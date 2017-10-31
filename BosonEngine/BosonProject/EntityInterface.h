@@ -8,7 +8,10 @@ class EntityInterface
 {
 public:
 	EntityInterface(Mesh* mesh, Material* mat)
-		: mesh(mesh), mat(mat) {}
+		: mesh(mesh), mat(mat)
+	{
+		transform = { DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0) };
+	}
 	~EntityInterface() { delete mesh; }
 
 	virtual void Init() = 0;

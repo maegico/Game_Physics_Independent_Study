@@ -1,5 +1,6 @@
 #pragma once
 #include "GraphicsCore.h"
+#include "BasicEntity.h"
 
 class Game : GraphicsCore
 {

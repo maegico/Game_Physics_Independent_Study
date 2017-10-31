@@ -1,12 +1,5 @@
 #include "GraphicsCore.h"
 
-struct matrixData
-{
-	DirectX::XMFLOAT4X4 world;
-	DirectX::XMFLOAT4X4 view;
-	DirectX::XMFLOAT4X4 proj;
-};
-
 GraphicsCore::GraphicsCore()
 {
 }
@@ -171,6 +164,15 @@ HRESULT GraphicsCore::InitGraphics()
 	immContext->RSSetViewports(1, &viewport);
 
 	assetManager.Init(device, immContext);
+	camera->updateProjection(width, height);
+
+	DirectX::XMFLOAT4X4 identity;
+	DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
+	matrices = {
+		identity,
+		camera->getViewMatrix(),
+		camera->getProjectionMatrix()
+	};
 
 	return S_OK;
 }
@@ -179,6 +181,9 @@ void GraphicsCore::OnResize(unsigned int width, unsigned int height)
 {
 	this->width = width;
 	this->height = height;
+
+	if (width == 0 || height == 0)
+		return;
 
 	if (depthStencilView) { depthStencilView->Release(); }
 	if (backBuffer) { backBuffer->Release(); }
@@ -235,7 +240,9 @@ void GraphicsCore::Draw()
 		{
 			DirectX::XMFLOAT4X4 identity;
 			DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
-			matrixData matrices = {
+			//matrices = { identity, identity, identity };
+			
+			matrices = {
 				identity,
 				camera->getViewMatrix(),
 				camera->getProjectionMatrix()
@@ -253,12 +260,12 @@ void GraphicsCore::Draw()
 
 			// Fill in the subresource data.
 			D3D11_SUBRESOURCE_DATA InitData;
-			InitData.pSysMem = NULL;
+			InitData.pSysMem = &matrices;
 			InitData.SysMemPitch = 0;
 			InitData.SysMemSlicePitch = 0;
 
 			// Create the buffer.
-			HRESULT hr = device->CreateBuffer(&cbDesc, NULL,
+			HRESULT hr = device->CreateBuffer(&cbDesc, &InitData,
 				&cBuffer);
 
 			if (FAILED(hr))continue;
@@ -278,7 +285,7 @@ void GraphicsCore::Draw()
 			//Set Vertex and Pixel Shader
 			//Set Vertex and Index Buffers
 			//call DrawIndexed
-			immContext->UpdateSubresource(cBuffer, 0, 0, &matrices, 0, 0);
+			//immContext->UpdateSubresource(cBuffer, 0, 0, &matrices, 0, 0);
 			immContext->VSSetConstantBuffers(0, 1, &cBuffer);
 			vshader->SetShader(immContext);
 			pshader->SetPixelShader(immContext);

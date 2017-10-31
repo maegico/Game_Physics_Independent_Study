@@ -18,11 +18,17 @@ HRESULT Game::Init()
 	HRESULT result = GraphicsCore::InitGraphics();
 	if (FAILED(result)) return result;
 
+	Mesh* mesh = assetManager.GetMesh("cube.obj");
+	Material* mat = assetManager.GetMaterial("base");
+	objs["test"] = (EntityInterface*)new BasicEntity(mesh, mat);
+
 	return S_OK;
 }
 
 void Game::Update()
 {
+	camera->update(0.001f);
+	//GraphicsCore::testCamera();
 }
 
 void Game::Draw()

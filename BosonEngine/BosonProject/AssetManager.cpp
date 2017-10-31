@@ -91,6 +91,8 @@ void AssetManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 		CreateMesh(models[i], device);
 	}
 
+	LoadMaterial("base", "sampler", "VertexShader.cso", "PixelShader.cso", "");
+
 	context->Release();
 	device->Release();
 }
@@ -103,8 +105,10 @@ Material* AssetManager::LoadMaterial(std::string name, std::string samplerName, 
 	ID3D11SamplerState*  sampler = m_samplers[samplerName];
 	Texture* texture = m_textures[textureName];
 	//ID3D11ShaderResourceView* normalMap = m_textures[normalMapName];
-
-	mat = new Material(vshader, pshader, sampler, texture, 1);
+	int numTextures = 1;
+	if (texture == nullptr)
+		numTextures = 0;
+	mat = new Material(vshader, pshader, sampler, texture, numTextures);
 	m_materials[name] = mat;
 	return mat;
 }

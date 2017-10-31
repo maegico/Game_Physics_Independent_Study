@@ -14,9 +14,17 @@
 
 #pragma comment(lib, "d3d11.lib")
 
+struct matrixData
+{
+	DirectX::XMFLOAT4X4 world;
+	DirectX::XMFLOAT4X4 view;
+	DirectX::XMFLOAT4X4 proj;
+};
+
 class GraphicsCore
 {
 protected:
+	AssetManager assetManager;
 	Camera* camera;
 	std::unordered_map<std::string, EntityInterface*> objs;
 
@@ -52,10 +60,10 @@ private:
 
 	ID3D11RenderTargetView* backBuffer;
 	ID3D11DepthStencilView* depthStencilView;
+	matrixData matrices;
 
 	//ThreadManager* threadManager;
 
 	//std::vector<ID3D11CommandList*> cmdLists;
-	AssetManager assetManager;
 };
 
