@@ -209,6 +209,7 @@ void Collision::CollisionSystem::CheckCollisions()
 
 bool Collision::Sphere_AABB(Collider a, Collider b)
 {
+
 	return false;
 }
 
@@ -224,11 +225,18 @@ bool Collision::Sphere_OBB(Collider a, Collider b)
 
 bool Collision::AABB_AABB(Collider a, Collider b)
 {
-	return false;
+	AABBMesh a1 = *(AABBMesh*)&a.getMesh();
+	AABBMesh a2 = *(AABBMesh*)&b.getMesh();
+	if (a1.max.x < a1.min.x || a1.min.x > a2.max.x) return 0;
+	if (a1.max.y < a1.min.y || a1.min.y > a2.max.y) return 0;
+	if (a1.max.z < a1.min.z || a1.min.z > a2.max.z) return 0;
+	return 1;
 }
 
 bool Collision::AABB_OBB(Collider a, Collider b)
 {
+	OBBMesh a1 = *(OBBMesh*)&a.getMesh();
+	OBBMesh a2 = *(OBBMesh*)&b.getMesh();
 	return false;
 }
 

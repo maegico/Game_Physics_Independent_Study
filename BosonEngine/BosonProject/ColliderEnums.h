@@ -14,24 +14,27 @@ enum ColliderType
 	Rigidbody
 };
 
-struct ColliderMesh
+class ColliderMesh
 {};
 
 //Do min, max or  center, halfwidths
-struct AABB : ColliderMesh
+class AABBMesh : ColliderMesh
 {
+public:
 	DirectX::XMFLOAT3 min;
 	DirectX::XMFLOAT3 max;
 };
 
-struct OBB : ColliderMesh
+class OBBMesh : ColliderMesh
 {
+public:
 	DirectX::XMFLOAT3 min;
 	DirectX::XMFLOAT3 max;
 };
 
-struct Sphere : ColliderMesh
+class SphereMesh : ColliderMesh
 {
-	DirectX::XMFLOAT3 min;
-	DirectX::XMFLOAT3 max;
+public:
+	DirectX::XMFLOAT3 center;
+	float radius;
 };

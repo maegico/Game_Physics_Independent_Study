@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <DirectXMath.h>
 #include "ColliderEnums.h"
 #include "Transform.h"
 #include "Vertex.h"
@@ -19,6 +21,8 @@ public:
 
 	void(*onCollision)();
 
+	ColliderMesh getMesh();
+
 private:
 	ColliderType colType;
 	MeshType mType;
@@ -26,5 +30,5 @@ private:
 	ColliderMesh mesh;
 	int id;
 
-	bool computeColliderMesh(MeshType meshType, Vertex* vertArray);
+	bool computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertArray);
 };

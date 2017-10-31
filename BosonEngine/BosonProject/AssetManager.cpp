@@ -209,8 +209,8 @@ void AssetManager::CreateMesh(std::string objFile, ID3D11Device* device)
 	// Variables used while reading the file
 	std::vector<DirectX::XMFLOAT3> positions;     // Positions from the file
 	std::vector<DirectX::XMFLOAT3> normals;       // Normals from the file
-	std::vector<DirectX::XMFLOAT3> tangents;       // Tangents calculated
-	std::vector<DirectX::XMFLOAT3> binormals;       // Binormals calculated
+	//std::vector<DirectX::XMFLOAT3> tangents;       // Tangents calculated
+	//std::vector<DirectX::XMFLOAT3> binormals;       // Binormals calculated
 	std::vector<DirectX::XMFLOAT2> uvs;           // UVs from the file
 	std::vector<Vertex> verts;           // Verts we're assembling
 	std::vector<UINT> indices;           // Indices of these verts
