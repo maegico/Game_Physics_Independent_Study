@@ -1,6 +1,7 @@
 #pragma once
 #include "Mesh.h"
 #include "Transform.h"
+#include "Collider.h"
 
 class EntityInterface
 {
@@ -17,6 +18,7 @@ public:
 private:
 	Mesh* mesh;
 	Transform transform;
+	//Collider collider;
 	//Material* mat;
 	//Can have a component pointer
 	//have an add component function that adds a new component to the list (which is the pointer)

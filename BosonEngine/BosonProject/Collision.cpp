@@ -1,5 +1,10 @@
 #include "Collision.h"
 
+using namespace DirectX;
+
+//nice Website:
+//https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+
 Collision::CollisionSystem::CollisionSystem()
 {
 }
@@ -215,7 +220,15 @@ bool Collision::Sphere_AABB(Collider a, Collider b)
 
 bool Collision::Sphere_Sphere(Collider a, Collider b)
 {
-	return false;
+	float distance;
+	SphereMesh a1 = *(SphereMesh*)&a.getMesh();
+	SphereMesh a2 = *(SphereMesh*)&b.getMesh();
+	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.center);
+	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.center);;
+	DirectX::XMVECTOR length = DirectX::XMVector3Length(c1 - c2);
+	XMStoreFloat(&distance, length);
+
+	return distance < a1.radius + a2.radius;
 }
 
 bool Collision::Sphere_OBB(Collider a, Collider b)
