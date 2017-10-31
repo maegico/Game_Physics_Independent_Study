@@ -147,6 +147,8 @@
     <ClCompile Include="BasicEntity.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GraphicsCore.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -163,6 +165,9 @@
     <ClInclude Include="BasicEntity.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="ColliderEnums.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="EntityInterface.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphicsCore.h" />
