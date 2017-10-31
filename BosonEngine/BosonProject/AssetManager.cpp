@@ -438,7 +438,7 @@ void AssetManager::CreateVShader(std::wstring shader, ID3D11Device* device)
 {
 	std::wstring compiledName = shader.substr(0, shader.length() - 4);
 	compiledName += L"cso";
-	std::wstring releasePath = L"Debug/";
+	std::wstring releasePath = L"../Debug/";
 	releasePath = releasePath + compiledName;
 
 	std::wstring debugPath = L"Assets/VShaders/" + compiledName;
@@ -466,10 +466,12 @@ void AssetManager::CreateVShader(std::wstring shader, ID3D11Device* device)
 
 	D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
-		{ "POSITION",0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "POSITION",0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXTCOORD",0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-	hr = device->CreateInputLayout(&ied[0], 2, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &layout);
+	hr = device->CreateInputLayout(&ied[0], 3, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &layout);
 	if (hr != S_OK)
 	{
 		Debug::Log("Failed to create input layout", LogType::Error);
@@ -486,7 +488,7 @@ void AssetManager::CreatePShader(std::wstring shader, ID3D11Device* device)
 {
 	std::wstring compiledName = shader.substr(0, shader.length() - 4);
 	compiledName += L"cso";
-	std::wstring releasePath = L"Debug/";
+	std::wstring releasePath = L"../Debug/";
 	releasePath = releasePath + compiledName;
 
 	std::wstring debugPath = L"Assets/VShaders/" + compiledName;

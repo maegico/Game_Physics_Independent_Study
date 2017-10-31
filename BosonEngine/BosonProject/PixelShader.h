@@ -8,6 +8,7 @@ public:
 	PixelShader(ID3D11PixelShader* shader);
 	~PixelShader();
 
+	void SetPixelShader(ID3D11DeviceContext* context);
 	ID3D11PixelShader* GetPShader();
 
 private:

@@ -10,6 +10,7 @@ public:
 
 	ID3D11VertexShader* GetVShader();
 	ID3D11InputLayout* GetInputLayout();
+	void SetShader(ID3D11DeviceContext* context);
 private:
 	ID3D11VertexShader* vshader;
 	ID3D11InputLayout* inputLayout;

@@ -1,9 +1,10 @@
 #pragma once
 #include "EntityInterface.h"
+
 class BasicEntity:EntityInterface
 {
 public:
-	BasicEntity(Mesh* m);
+	BasicEntity(Mesh* m, Material* mat);
 	~BasicEntity();
 	
 	void Init();

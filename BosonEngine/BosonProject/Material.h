@@ -10,6 +10,10 @@ public:
 	Material(VertexShader* vshader, PixelShader* pshader, ID3D11SamplerState* sampler, Texture* textures, unsigned int numTextures);
 	~Material();
 
+	VertexShader* getVShader();
+	PixelShader* getPShader();
+	ID3D11SamplerState* getSamplerState();
+
 private:
 	VertexShader* vshader;
 	PixelShader* pshader;

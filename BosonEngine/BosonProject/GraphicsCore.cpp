@@ -1,11 +1,18 @@
 #include "GraphicsCore.h"
 
+struct matrixData
+{
+	DirectX::XMFLOAT4X4 world;
+	DirectX::XMFLOAT4X4 view;
+	DirectX::XMFLOAT4X4 proj;
+};
+
 GraphicsCore::GraphicsCore()
 {
 }
 
 GraphicsCore::GraphicsCore(unsigned int width, unsigned int height, HWND hWnd)
-	: width(width), height(height), hWnd(hWnd)
+	: width(width), height(height), hWnd(hWnd), camera(new Camera())
 {
 	int size_threads = 0;
 
@@ -15,6 +22,7 @@ GraphicsCore::GraphicsCore(unsigned int width, unsigned int height, HWND hWnd)
 	backBuffer = nullptr;
 	depthStencilView = nullptr;
 
+	//camera = new Camera();
 
 	//Create the thread system here
 	/*threadManager = ThreadManager::GetThreadManager();
@@ -221,6 +229,66 @@ void GraphicsCore::OnResize(unsigned int width, unsigned int height)
 
 void GraphicsCore::Draw()
 {
+	for (auto i = objs.begin(); i != objs.end(); i++)
+	{
+		if (i->second != nullptr)
+		{
+			DirectX::XMFLOAT4X4 identity;
+			DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
+			matrixData matrices = {
+				identity,
+				camera->getViewMatrix(),
+				camera->getProjectionMatrix()
+			};
+
+			ID3D11Buffer* cBuffer;
+
+			D3D11_BUFFER_DESC cbDesc;
+			cbDesc.ByteWidth = sizeof(matrices);
+			cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+			cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			cbDesc.MiscFlags = 0;
+			cbDesc.StructureByteStride = 0;
+
+			// Fill in the subresource data.
+			D3D11_SUBRESOURCE_DATA InitData;
+			InitData.pSysMem = NULL;
+			InitData.SysMemPitch = 0;
+			InitData.SysMemSlicePitch = 0;
+
+			// Create the buffer.
+			HRESULT hr = device->CreateBuffer(&cbDesc, NULL,
+				&cBuffer);
+
+			if (FAILED(hr))continue;
+
+			Mesh* mesh = i->second->GetMesh();
+			Material* mat = i->second->GetMaterial();
+			ID3D11SamplerState* sampler = mat->getSamplerState();
+			VertexShader* vshader = mat->getVShader();
+			PixelShader* pshader = mat->getPShader();
+			ID3D11Buffer* vertBuff = mesh->GetVertexBuffer();
+			ID3D11Buffer* indexBuff = mesh->GetIndexBuffer();
+
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+
+			//need to setup, send, then set Constant Buffer Data
+			//Set Vertex and Pixel Shader
+			//Set Vertex and Index Buffers
+			//call DrawIndexed
+			immContext->UpdateSubresource(cBuffer, 0, 0, &matrices, 0, 0);
+			immContext->VSSetConstantBuffers(0, 1, &cBuffer);
+			vshader->SetShader(immContext);
+			pshader->SetPixelShader(immContext);
+			immContext->IASetVertexBuffers(0, 1, &vertBuff,
+				&stride, &offset);
+			immContext->IASetIndexBuffer(indexBuff, DXGI_FORMAT_R32_UINT, 0);
+			immContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+		}
+	}
+
 	//Here is where we execute the command lists
 	//for (int i = 0; i < 7; i++)
 	//{

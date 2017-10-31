@@ -1,12 +1,14 @@
 #pragma once
 #include "Mesh.h"
+#include "Material.h"
 #include "Transform.h"
 #include "Collider.h"
 
 class EntityInterface
 {
 public:
-	EntityInterface(Mesh* m) :mesh(m) {}
+	EntityInterface(Mesh* mesh, Material* mat)
+		: mesh(mesh), mat(mat) {}
 	~EntityInterface() { delete mesh; }
 
 	virtual void Init() = 0;
@@ -14,9 +16,11 @@ public:
 	virtual void Draw() = 0;
 
 	Mesh* GetMesh() { return mesh; }
+	Material* GetMaterial() { return mat; }
 
 private:
 	Mesh* mesh;
+	Material* mat;
 	Transform transform;
 	//Collider collider;
 	//Material* mat;

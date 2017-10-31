@@ -2,7 +2,8 @@
 
 
 
-BasicEntity::BasicEntity(Mesh* m):EntityInterface(m)
+BasicEntity::BasicEntity(Mesh* mesh, Material* mat)
+	: EntityInterface(mesh, mat)
 {
 }
 

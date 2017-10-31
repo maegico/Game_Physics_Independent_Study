@@ -23,3 +23,10 @@ ID3D11InputLayout * VertexShader::GetInputLayout()
 {
 	return inputLayout;
 }
+
+void VertexShader::SetShader(ID3D11DeviceContext * context)
+{
+	context->IASetInputLayout(inputLayout);
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->VSSetShader(vshader, 0, 0);
+}

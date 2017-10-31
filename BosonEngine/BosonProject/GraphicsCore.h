@@ -9,12 +9,15 @@
 #include "ThreadManager.h"
 #include "EntityInterface.h"
 #include "AssetManager.h"
+#include "Collision.h"
+#include "Camera.h"
 
 #pragma comment(lib, "d3d11.lib")
 
 class GraphicsCore
 {
 protected:
+	Camera* camera;
 	std::unordered_map<std::string, EntityInterface*> objs;
 
 	GraphicsCore();
