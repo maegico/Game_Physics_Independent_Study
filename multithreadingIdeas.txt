@@ -1,0 +1,7 @@
+Multi-threading ideas:
+State Based:
+State 1 is job requests phase
+State 2 is job sync phase
+Store the data in a specified place in memory
+	Maybe have an allocator manager with lots of allocators
+		store all memory there
