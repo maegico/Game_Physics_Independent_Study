@@ -166,7 +166,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Collider.h" />
-    <ClInclude Include="ColliderEnums.h" />
+    <ClInclude Include="CollisionTypes.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="EntityInterface.h" />
     <ClInclude Include="Game.h" />

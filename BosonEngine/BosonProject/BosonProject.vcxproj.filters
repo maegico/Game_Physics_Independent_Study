@@ -131,13 +131,13 @@
     <ClInclude Include="Collider.h">
       <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="ColliderEnums.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionTypes.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

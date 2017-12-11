@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <DirectXMath.h>
-#include "ColliderEnums.h"
+#include "CollisionTypes.h"
 #include "Transform.h"
 #include "Vertex.h"
 

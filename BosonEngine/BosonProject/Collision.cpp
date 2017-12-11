@@ -17,18 +17,42 @@ void Collision::CollisionSystem::BatchCollider(Collider& collider)
 {
 	if (collider.getID() == 0) return;
 
+	//ids don't work
+	//need to make it, so the show collider type & mesh type 
 	collider.setID(++idCount);
 	switch (collider.getColliderType())
 	{
 	case ColliderType::Static:
-		staticColliders.push_back(collider);
-		break;
+		switch (collider.getMeshType())
+		{
+		case MeshType::AABB:
+			staticAABB.push_back(collider);
+			break;
+		case MeshType::OBB:
+			staticOBB.push_back(collider);
+			break;
+		case MeshType::Sphere:
+			staticSphere.push_back(collider);
+			break;
+		}
 	case ColliderType::Rigidbody:
-		rigidbodyColliders.push_back(collider);
-		break;
+		switch (collider.getMeshType())
+		{
+		case MeshType::AABB:
+			rgdbdyAABB.push_back(collider);
+			break;
+		case MeshType::OBB:
+			rgdbdyOBB.push_back(collider);
+			break;
+		case MeshType::Sphere:
+			rgdbdySphere.push_back(collider);
+			break;
+		}
 	default:
 		break;
 	}
+
+	//should also presort them by collider mesh type 
 }
 
 void Collision::CollisionSystem::CheckCollisions()
@@ -44,55 +68,14 @@ void Collision::CollisionSystem::CheckCollisions()
 	//The only time this will happen is when the design places one atop the other
 		//Not going to worry about that right now
 
-	//for now we will try this:
-	std::vector<Collider*> staticAABB;
-	std::vector<Collider*> staticOBB;
-	std::vector<Collider*> staticSphere;
-
-	std::vector<Collider*> rgdbdyAABB;
-	std::vector<Collider*> rgdbdyOBB;
-	std::vector<Collider*> rgdbdySphere;
-
-	for (int i = 0; i < staticColliders.size(); i++)
-	{
-		switch (staticColliders[i].getMeshType())
-		{
-		case MeshType::AABB:
-			staticAABB.push_back(&staticColliders[i]);
-			break;
-		case MeshType::OBB:
-			staticOBB.push_back(&staticColliders[i]);
-			break;
-		case MeshType::Sphere:
-			staticSphere.push_back(&staticColliders[i]);
-			break;
-		}
-	}
-
-	for (int i = 0; i < rigidbodyColliders.size(); i++)
-	{
-		switch (rigidbodyColliders[i].getMeshType())
-		{
-		case MeshType::AABB:
-			rgdbdyAABB.push_back(&rigidbodyColliders[i]);
-			break;
-		case MeshType::OBB:
-			rgdbdyOBB.push_back(&rigidbodyColliders[i]);
-			break;
-		case MeshType::Sphere:
-			rgdbdySphere.push_back(&rigidbodyColliders[i]);
-			break;
-		}
-	}
-
 	//Static AABB checks!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	for (int i = 0; i < staticAABB.size(); i++)
 	{
 		for(int j = 0; j < rgdbdyAABB.size(); j++)
 		{
-			if (AABB_AABB(*staticAABB[i], *rgdbdyAABB[j]))
-				rgdbdyAABB[i]->onCollision();
+			if (AABB_AABB(staticAABB[i], rgdbdyAABB[j]))
+				rgdbdyAABB[i].onCollision();
 		}
 	}
 
@@ -100,8 +83,8 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = 0; j < rgdbdyOBB.size(); j++)
 		{
-			if (AABB_OBB(*staticAABB[i], *rgdbdyOBB[j]))
-				rgdbdyOBB[i]->onCollision();
+			if (AABB_OBB(staticAABB[i], rgdbdyOBB[j]))
+				rgdbdyOBB[i].onCollision();
 		}
 	}
 
@@ -109,8 +92,8 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = 0; j < rgdbdySphere.size(); j++)
 		{
-			if (Sphere_AABB(*rgdbdySphere[j], *staticAABB[i]))
-				rgdbdySphere[i]->onCollision();
+			if (Sphere_AABB(rgdbdySphere[j], staticAABB[i]))
+				rgdbdySphere[i].onCollision();
 		}
 	}
 
@@ -120,8 +103,8 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = 0; j < rgdbdyAABB.size(); j++)
 		{
-			if (AABB_OBB(*rgdbdyAABB[j], *staticOBB[i]))
-				rgdbdyAABB[i]->onCollision();
+			if (AABB_OBB(rgdbdyAABB[j], staticOBB[i]))
+				rgdbdyAABB[i].onCollision();
 		}
 	}
 
@@ -129,8 +112,8 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = 0; j < rgdbdyOBB.size(); j++)
 		{
-			if (OBB_OBB(*staticOBB[i], *rgdbdyOBB[j]))
-				rgdbdyOBB[i]->onCollision();
+			if (OBB_OBB(staticOBB[i], rgdbdyOBB[j]))
+				rgdbdyOBB[i].onCollision();
 		}
 	}
 
@@ -138,8 +121,8 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = 0; j < rgdbdySphere.size(); j++)
 		{
-			if (Sphere_OBB(*rgdbdySphere[j], *staticOBB[i]))
-				rgdbdySphere[i]->onCollision();
+			if (Sphere_OBB(rgdbdySphere[j], staticOBB[i]))
+				rgdbdySphere[i].onCollision();
 		}
 	}
 
@@ -149,8 +132,8 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = 0; j < rgdbdyAABB.size(); j++)
 		{
-			if (Sphere_AABB(*staticSphere[i], *rgdbdyAABB[j]))
-				rgdbdyAABB[i]->onCollision();
+			if (Sphere_AABB(staticSphere[i], rgdbdyAABB[j]))
+				rgdbdyAABB[i].onCollision();
 		}
 	}
 
@@ -158,8 +141,8 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = 0; j < rgdbdyOBB.size(); j++)
 		{
-			if (Sphere_OBB(*staticSphere[i], *rgdbdyOBB[j]))
-				rgdbdyOBB[i]->onCollision();
+			if (Sphere_OBB(staticSphere[i], rgdbdyOBB[j]))
+				rgdbdyOBB[i].onCollision();
 		}
 	}
 
@@ -167,8 +150,8 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = 0; j < rgdbdySphere.size(); j++)
 		{
-			if (Sphere_Sphere(*rgdbdySphere[j], *staticSphere[i]))
-				rgdbdySphere[i]->onCollision();
+			if (Sphere_Sphere(rgdbdySphere[j], staticSphere[i]))
+				rgdbdySphere[i].onCollision();
 		}
 	}
 
@@ -178,10 +161,10 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = i+1; j < rgdbdyAABB.size(); j++)
 		{
-			if (AABB_AABB(*rgdbdyAABB[i], *rgdbdyAABB[j]))
+			if (AABB_AABB(rgdbdyAABB[i], rgdbdyAABB[j]))
 			{
-				rgdbdyAABB[i]->onCollision();
-				rgdbdyAABB[j]->onCollision();
+				rgdbdyAABB[i].onCollision();
+				rgdbdyAABB[j].onCollision();
 			}
 		}
 	}
@@ -190,11 +173,11 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = i + 1; j < rgdbdyOBB.size(); j++)
 		{
-			if (Sphere_OBB(*rgdbdyOBB[i], *rgdbdyOBB[j]))
+			if (Sphere_OBB(rgdbdyOBB[i], rgdbdyOBB[j]))
 				
 			{
-				rgdbdyOBB[i]->onCollision();
-				rgdbdyOBB[j]->onCollision();
+				rgdbdyOBB[i].onCollision();
+				rgdbdyOBB[j].onCollision();
 			}
 		}
 	}
@@ -203,16 +186,16 @@ void Collision::CollisionSystem::CheckCollisions()
 	{
 		for (int j = i + 1; j < rgdbdySphere.size(); j++)
 		{
-			if (Sphere_Sphere(*rgdbdySphere[i], *rgdbdySphere[j]))
+			if (Sphere_Sphere(rgdbdySphere[i], rgdbdySphere[j]))
 			{
-				rgdbdySphere[i]->onCollision();
-				rgdbdySphere[j]->onCollision();
+				rgdbdySphere[i].onCollision();
+				rgdbdySphere[j].onCollision();
 			}
 		}
 	}
 }
 
-bool Collision::Sphere_AABB(Collider a, Collider b)
+bool Collision::Sphere_AABB(Collider sphere, Collider aabb)
 {
 
 	return false;
@@ -220,36 +203,40 @@ bool Collision::Sphere_AABB(Collider a, Collider b)
 
 bool Collision::Sphere_Sphere(Collider a, Collider b)
 {
+	//vec1 = center
+	//vec2.x = radius
 	float distance;
-	SphereMesh a1 = *(SphereMesh*)&a.getMesh();
-	SphereMesh a2 = *(SphereMesh*)&b.getMesh();
-	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.center);
-	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.center);;
+	ColliderMesh a1 = a.getMesh();
+	ColliderMesh a2 = b.getMesh();
+	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.vec1);
+	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.vec1);
 	DirectX::XMVECTOR length = DirectX::XMVector3Length(c1 - c2);
 	XMStoreFloat(&distance, length);
 
-	return distance < a1.radius + a2.radius;
+	return distance < a1.vec2.x + a2.vec2.x;
 }
 
-bool Collision::Sphere_OBB(Collider a, Collider b)
+bool Collision::Sphere_OBB(Collider sphere, Collider obb)
 {
 	return false;
 }
 
 bool Collision::AABB_AABB(Collider a, Collider b)
 {
-	AABBMesh a1 = *(AABBMesh*)&a.getMesh();
-	AABBMesh a2 = *(AABBMesh*)&b.getMesh();
-	if (a1.max.x < a1.min.x || a1.min.x > a2.max.x) return 0;
-	if (a1.max.y < a1.min.y || a1.min.y > a2.max.y) return 0;
-	if (a1.max.z < a1.min.z || a1.min.z > a2.max.z) return 0;
+	//vec1 = min, vec2 = max
+	ColliderMesh a1 = a.getMesh();
+	ColliderMesh a2 = b.getMesh();
+	if (a1.vec2.x < a1.vec1.x || a1.vec1.x > a2.vec2.x) return 0;
+	if (a1.vec2.y < a1.vec1.y || a1.vec1.y > a2.vec2.y) return 0;
+	if (a1.vec2.z < a1.vec1.z || a1.vec1.z > a2.vec2.z) return 0;
 	return 1;
 }
 
-bool Collision::AABB_OBB(Collider a, Collider b)
+//Collider a = AABB, Collider b = OBB
+bool Collision::AABB_OBB(Collider aabb, Collider obb)
 {
-	OBBMesh a1 = *(OBBMesh*)&a.getMesh();
-	OBBMesh a2 = *(OBBMesh*)&b.getMesh();
+	ColliderMesh a1 = aabb.getMesh();
+	ColliderMesh a2 = obb.getMesh();
 	return false;
 }
 

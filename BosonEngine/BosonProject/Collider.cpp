@@ -41,9 +41,10 @@ ColliderMesh Collider::getMesh()
 
 bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertArray)
 {
-	AABBMesh abox = {};
+	ColliderMesh cmesh = {};
+	/*AABBMesh abox = {};
 	OBBMesh obox = {};
-	SphereMesh sphere = {};
+	SphereMesh sphere = {};*/
 	DirectX::XMFLOAT3 temp;
 	int index1 = 0;
 	int index2 = 0.0f;
@@ -59,20 +60,20 @@ bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertA
 			DirectX::XMVECTOR altered = DirectX::XMLoadFloat3(&vertArray[i].Position);
 			//perform the necessary calculations, rotate, scale, then calculate the box with that
 			XMStoreFloat3(&temp, altered);
-			if (temp.x < obox.min.x)
-				obox.min.x = temp.x;
-			else if (temp.x > obox.max.x)
-				obox.max.x = temp.x;
+			if (temp.x < cmesh.vec1.x)
+				cmesh.vec1.x = temp.x;
+			else if (temp.x > cmesh.vec2.x)
+				cmesh.vec2.x = temp.x;
 
-			if (temp.y < obox.min.y)
-				obox.min.y = temp.y;
-			else if (temp.y > obox.max.y)
-				obox.max.y = temp.y;
+			if (temp.y < cmesh.vec1.y)
+				cmesh.vec1.y = temp.y;
+			else if (temp.y > cmesh.vec2.y)
+				cmesh.vec2.y = temp.y;
 
-			if (temp.y < obox.min.y)
-				obox.min.y = temp.y;
-			else if (temp.y > obox.max.y)
-				obox.max.y = temp.y;
+			if (temp.y < cmesh.vec1.y)
+				cmesh.vec1.y = temp.y;
+			else if (temp.y > cmesh.vec2.y)
+				cmesh.vec2.y = temp.y;
 		}
 		break;
 	case MeshType::OBB:
@@ -80,26 +81,23 @@ bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertA
 		for (int i = 0; i < vertArray.size(); i++)
 		{
 			DirectX::XMFLOAT3 pos = vertArray[i].Position;
-			if (pos.x < obox.min.x)
-				obox.min.x = pos.x;
-			else if (pos.x > obox.max.x)
-				obox.max.x = pos.x;
+			if (pos.x < cmesh.vec1.x)
+				cmesh.vec1.x = pos.x;
+			else if (pos.x > cmesh.vec2.x)
+				cmesh.vec2.x = pos.x;
 
-			if (pos.y < obox.min.y)
-				obox.min.y = pos.y;
-			else if (pos.y > obox.max.y)
-				obox.max.y = pos.y;
+			if (pos.y < cmesh.vec1.y)
+				cmesh.vec1.y = pos.y;
+			else if (pos.y > cmesh.vec2.y)
+				cmesh.vec2.y = pos.y;
 
-			if (pos.y < obox.min.y)
-				obox.min.y = pos.y;
-			else if (pos.y > obox.max.y)
-				obox.max.y = pos.y;
+			if (pos.y < cmesh.vec1.z)
+				cmesh.vec1.z = pos.z;
+			else if (pos.z > cmesh.vec2.z)
+				cmesh.vec2.z = pos.z;
 		}
 		break;
 	case MeshType::Sphere:
-		
-		
-		
 		for (int i = 0; i < vertArray.size(); i++)
 		{
 			//XMVector3Length
@@ -137,14 +135,14 @@ bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertA
 		DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&vertArray[index2].Position);
 		DirectX::XMVECTOR length = DirectX::XMVector3Length(v1 - v2);
 
-		DirectX::XMStoreFloat(&sphere.radius, length);
-		sphere.radius /= 2;
+		DirectX::XMStoreFloat(&cmesh.vec2.x, length);
+		cmesh.vec2.x /= 2;
 
-		DirectX::XMVECTOR centerTemp = v1 + DirectX::XMVector3Normalize(v2-v1) * sphere.radius;
+		DirectX::XMVECTOR centerTemp = v1 + DirectX::XMVector3Normalize(v2-v1) * cmesh.vec2.x;
 		
 		while (notFitted)
 		{
-			DirectX::XMVECTOR tempCenter = DirectX::XMLoadFloat3(&sphere.center);
+			DirectX::XMVECTOR tempCenter = DirectX::XMLoadFloat3(&cmesh.vec1);
 			for (int i = 0; i < vertArray.size(); i++)
 			{
 				float tempDistance;
@@ -152,16 +150,16 @@ bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertA
 				DirectX::XMVECTOR vec = DirectX::XMLoadFloat3(&vertArray[i].Position);
 				DirectX::XMVECTOR tempLength = DirectX::XMVector3Length(tempCenter - vec);
 				DirectX::XMStoreFloat(&tempDistance, tempLength);
-				if (tempDistance > sphere.radius)
+				if (tempDistance > cmesh.vec2.x)
 				{
 					XMFLOAT3 tempAdd;
-					float change = (tempDistance - sphere.radius) / 2.0f;
-					sphere.radius += change;
+					float change = (tempDistance - cmesh.vec2.x) / 2.0f;
+					cmesh.vec2.x += change;
 
 					tempCenter += DirectX::XMVector3Normalize(vec - tempCenter) * change;
 					break;
 				}
-				XMStoreFloat3(&sphere.center, tempCenter);
+				XMStoreFloat3(&cmesh.vec1, tempCenter);
 
 				if (i + 1 == vertArray.size())
 					notFitted = false;
