@@ -24,25 +24,3 @@ public:
 	DirectX::XMFLOAT3 vec2;
 	DirectX::XMFLOAT3 axes[3];
 };
-
-//Do min, max or  center, halfwidths
-//class AABBMesh : ColliderMesh
-//{
-//public:
-//	DirectX::XMFLOAT3 min;
-//	DirectX::XMFLOAT3 max;
-//};
-//
-//class OBBMesh : ColliderMesh
-//{
-//public:
-//	DirectX::XMFLOAT3 min;
-//	DirectX::XMFLOAT3 max;
-//};
-//
-//class SphereMesh : ColliderMesh
-//{
-//public:
-//	DirectX::XMFLOAT3 center;
-//	float radius;
-//};
