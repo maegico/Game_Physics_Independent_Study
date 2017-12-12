@@ -42,9 +42,6 @@ ColliderMesh Collider::getMesh()
 bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertArray)
 {
 	ColliderMesh cmesh = {};
-	/*AABBMesh abox = {};
-	OBBMesh obox = {};
-	SphereMesh sphere = {};*/
 	DirectX::XMFLOAT3 temp;
 	int index1 = 0;
 	int index2 = 0.0f;
@@ -77,25 +74,35 @@ bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertA
 		}
 		break;
 	case MeshType::OBB:
-		
+		//for SAT, store center, axes, and halfwidths
+
+		DirectX::XMFLOAT3 min = vertArray[0].Position;
+		DirectX::XMFLOAT3 max = vertArray[0].Position;
+
 		for (int i = 0; i < vertArray.size(); i++)
 		{
 			DirectX::XMFLOAT3 pos = vertArray[i].Position;
-			if (pos.x < cmesh.vec1.x)
-				cmesh.vec1.x = pos.x;
-			else if (pos.x > cmesh.vec2.x)
-				cmesh.vec2.x = pos.x;
+			if (pos.x < min.x)
+				min.x = pos.x;
+			else if (pos.x > max.x)
+				max.x = pos.x;
 
-			if (pos.y < cmesh.vec1.y)
-				cmesh.vec1.y = pos.y;
-			else if (pos.y > cmesh.vec2.y)
-				cmesh.vec2.y = pos.y;
+			if (pos.y < min.y)
+				min.y = pos.y;
+			else if (pos.y > max.y)
+				max.y = pos.y;
 
-			if (pos.y < cmesh.vec1.z)
-				cmesh.vec1.z = pos.z;
-			else if (pos.z > cmesh.vec2.z)
-				cmesh.vec2.z = pos.z;
+			if (pos.y < min.z)
+				min.z = pos.z;
+			else if (pos.z > max.z)
+				max.z = pos.z;
 		}
+
+		cmesh.vec2 = halfpoint(min, max);
+		cmesh.vec1 = cmesh.vec2;
+		cmesh.axes[0] = DirectX::XMFLOAT3(1, 0, 0);
+		cmesh.axes[1] = DirectX::XMFLOAT3(0, 1, 0);
+		cmesh.axes[2] = DirectX::XMFLOAT3(0, 0, 1);
 		break;
 	case MeshType::Sphere:
 		for (int i = 0; i < vertArray.size(); i++)
@@ -170,4 +177,10 @@ bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertA
 		break;
 	}
 	return false;
+}
+
+DirectX::XMFLOAT3 Collider::halfpoint(DirectX::XMFLOAT3 vec1, DirectX::XMFLOAT3 vec2)
+{
+	//glm::vec3((vec2.x - vec1.x) / 2, (vec2.y - vec1.y) / 2, (vec2.z - vec1.z) / 2);
+	return DirectX::XMFLOAT3((vec2.x - vec1.x) / 2, (vec2.y - vec1.y) / 2, (vec2.z - vec1.z) / 2);
 }

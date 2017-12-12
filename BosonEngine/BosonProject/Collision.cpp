@@ -242,5 +242,39 @@ bool Collision::AABB_OBB(Collider aabb, Collider obb)
 
 bool Collision::OBB_OBB(Collider a, Collider b)
 {
+	//SAT
+	ColliderMesh a1 = a.getMesh();
+	ColliderMesh a2 = b.getMesh();
+
+	float ra, rb;
+	DirectX::XMFLOAT3X3 r, absR;
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			XMVECTOR vec1 = XMLoadFloat3(&a1.axes[i]);
+			XMVECTOR vec2 = XMLoadFloat3(&a2.axes[j]);
+			XMVECTOR dot = XMVector3Dot(vec1, vec2);
+			XMStoreFloat(&r(i,j), dot);
+		}
+	}
+
+	//Compute the translation vector
+	XMFLOAT3 t;
+	XMVECTOR translationVec = XMLoadFloat3(&a2.vec1) - XMLoadFloat3(&a1.vec1);
+	//bring translation into a's coordinate frame
+	//set t equal (dot of t & a's axis0, dot of t & a's axis1, dot of t & a's axis2)
+	
+	XMVECTOR t1 = XMLoadFloat3(&a1.axes[0]);
+	XMVECTOR t2 = XMLoadFloat3(&a1.axes[1]);
+	XMVECTOR t3 = XMLoadFloat3(&a1.axes[2]);
+
+	XMVECTOR dotT1 = XMVector3Dot(translationVec, t1);
+	XMVECTOR dotT2 = XMVector3Dot(translationVec, t2);
+	XMVECTOR dotT3 = XMVector3Dot(translationVec, t3);
+
+
+
 	return false;
 }

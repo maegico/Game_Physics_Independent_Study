@@ -31,4 +31,5 @@ private:
 	int id;
 
 	bool computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertArray);
+	DirectX::XMFLOAT3 halfpoint(DirectX::XMFLOAT3 vec1, DirectX::XMFLOAT3 vec2);
 };
