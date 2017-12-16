@@ -47,6 +47,8 @@ bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertA
 	int index2 = 0.0f;
 	float mag = -1.0f;
 	bool notFitted = true;
+	DirectX::XMFLOAT3 min = vertArray[0].Position;
+	DirectX::XMFLOAT3 max = vertArray[0].Position;
 
 	switch (meshType)
 	{
@@ -75,9 +77,6 @@ bool Collider::computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertA
 		break;
 	case MeshType::OBB:
 		//for SAT, store center, axes, and halfwidths
-
-		DirectX::XMFLOAT3 min = vertArray[0].Position;
-		DirectX::XMFLOAT3 max = vertArray[0].Position;
 
 		for (int i = 0; i < vertArray.size(); i++)
 		{
