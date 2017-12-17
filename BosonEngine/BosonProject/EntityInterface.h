@@ -7,11 +7,12 @@
 class EntityInterface
 {
 public:
-	EntityInterface(Mesh* mesh, Material* mat)
-		: mesh(mesh), mat(mat)
+	EntityInterface(Mesh* mesh, Material* mat, ColliderType colType, ColliderMesh* cmesh)
+		: mesh(mesh), mat(mat), collider(colType, cmesh, transform)
 	{
 		transform = { DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0) };
 	}
+
 	~EntityInterface() { delete mesh; }
 
 	virtual void Init() = 0;
@@ -25,13 +26,6 @@ private:
 	Mesh* mesh;
 	Material* mat;
 	Transform transform;
-	//Collider collider;
-	//Material* mat;
-	//Can have a component pointer
-	//have an add component function that adds a new component to the list (which is the pointer)
-	//could create a vector for this
-
-	//This implements the strategy pattern
-	//essentially a functor
+	Collider collider;
 };
 

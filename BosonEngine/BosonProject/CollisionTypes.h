@@ -1,5 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
+#include "Vertex.h"
+#include <vector>
 
 enum MeshType
 {
@@ -20,7 +22,17 @@ enum ColliderType
 class ColliderMesh
 {
 public:
+	MeshType mType;
 	DirectX::XMFLOAT3 vec1;
 	DirectX::XMFLOAT3 vec2;
 	DirectX::XMFLOAT3 axes[3];
 };
+
+namespace ColliderMeshFunctions
+{
+
+	using namespace DirectX;
+
+	DirectX::XMFLOAT3 halfpoint(DirectX::XMFLOAT3 vec1, DirectX::XMFLOAT3 vec2);
+	ColliderMesh* computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertArray);
+}

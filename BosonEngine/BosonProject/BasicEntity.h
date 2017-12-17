@@ -4,7 +4,7 @@
 class BasicEntity:EntityInterface
 {
 public:
-	BasicEntity(Mesh* m, Material* mat);
+	BasicEntity(Mesh* m, ColliderMesh* cmesh, Material* mat);
 	~BasicEntity();
 	
 	void Init();

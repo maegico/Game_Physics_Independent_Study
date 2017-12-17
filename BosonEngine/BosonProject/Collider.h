@@ -10,26 +10,18 @@ class Collider
 public:
 	bool inUse;
 
-	Collider(ColliderType colliderType, MeshType meshType,
-		Transform& transform, void(*onCollisionFunc)(), Vertex* vertArray);
+	Collider(ColliderType colliderType, ColliderMesh* cmesh, Transform& transform);
 	~Collider();
 
 	ColliderType getColliderType();
 	MeshType getMeshType();
+	ColliderMesh* getMesh();
 	void setID(int id);
 	int getID();
-
 	void(*onCollision)();
-
-	ColliderMesh getMesh();
-
 private:
 	ColliderType colType;
-	MeshType mType;
 	Transform& transform;
-	ColliderMesh mesh;
+	ColliderMesh* mesh;
 	int id;
-
-	bool computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertArray);
-	DirectX::XMFLOAT3 halfpoint(DirectX::XMFLOAT3 vec1, DirectX::XMFLOAT3 vec2);
 };

@@ -15,8 +15,6 @@ GraphicsCore::GraphicsCore(unsigned int width, unsigned int height, HWND hWnd)
 	backBuffer = nullptr;
 	depthStencilView = nullptr;
 
-	//camera = new Camera();
-
 	//Create the thread system here
 	/*threadManager = ThreadManager::GetThreadManager();
 	size_threads = threadManager->getHdwConcurrency();

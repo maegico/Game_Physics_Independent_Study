@@ -9,7 +9,6 @@
 #include "ThreadManager.h"
 #include "EntityInterface.h"
 #include "AssetManager.h"
-#include "Collision.h"
 #include "Camera.h"
 
 #pragma comment(lib, "d3d11.lib")
@@ -41,10 +40,6 @@ protected:
 	virtual void Draw();
 
 	void ClearBackAndDepthBuffers();
-	
-
-	/*void QueueEntityDraw();
-	void QueueEntityBatch();*/
 
 private:
 	unsigned int width;

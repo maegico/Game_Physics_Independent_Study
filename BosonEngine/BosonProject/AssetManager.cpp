@@ -28,7 +28,6 @@ AssetManager::~AssetManager()
 		if (i->second != nullptr)
 		{
 			i->second->getTexture()->Release();
-			//i->second->Release();
 		}
 	}
 	for (auto i = m_vshaders.begin(); i != m_vshaders.end(); i++)
@@ -45,8 +44,8 @@ AssetManager::~AssetManager()
 
 void AssetManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 {
-	device->AddRef();
-	context->AddRef();
+	/*device->AddRef();
+	context->AddRef();*/
 
 	m_materials = std::unordered_map<std::string, Material*>();
 	m_meshes = std::unordered_map<std::string, Mesh*>();
@@ -93,8 +92,8 @@ void AssetManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 
 	LoadMaterial("base", "sampler", "VertexShader.cso", "PixelShader.cso", "");
 
-	context->Release();
-	device->Release();
+	/*context->Release();
+	device->Release();*/
 }
 
 Material* AssetManager::LoadMaterial(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName)
@@ -116,6 +115,11 @@ Material* AssetManager::LoadMaterial(std::string name, std::string samplerName, 
 Mesh* AssetManager::GetMesh(std::string mesh)
 {
 	return m_meshes[mesh];
+}
+
+ColliderMesh * AssetManager::GetColliderMesh(std::string name)
+{
+	return m_colmeshes[name];
 }
 
 Material * AssetManager::GetMaterial(std::string name)
@@ -200,6 +204,7 @@ Material * AssetManager::GetMaterial(std::string name)
 
 void AssetManager::CreateMesh(std::string objFile, ID3D11Device* device)
 {
+	MeshType mType = MeshType::AABB;
 	std::string releasePath = "Assets/Models/";
 	releasePath = releasePath + objFile;
 
@@ -333,6 +338,12 @@ void AssetManager::CreateMesh(std::string objFile, ID3D11Device* device)
 				indices.push_back(vertCounter); vertCounter += 1;
 			}
 		}
+		else if (chars[0] == 'm')
+		{
+			//int num = 1;
+			sscanf_s(chars, "m %d", &mType);
+			//mType = (MeshType)num;
+		}
 	}
 
 	// Close the file and create the actual buffers
@@ -340,6 +351,9 @@ void AssetManager::CreateMesh(std::string objFile, ID3D11Device* device)
 
 	//CalculateTangents(&verts[0], verts.size(), &indices[0], indices.size());
 	
+	ColliderMesh* cmesh = ColliderMeshFunctions::computeColliderMesh(mType, verts);
+	m_colmeshes[objFile] = cmesh;
+
 	//right here we need to create the vertex buffer and the index buffer
 
 	ID3D11Buffer* vertBuf;

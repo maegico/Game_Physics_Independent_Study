@@ -2,8 +2,8 @@
 
 
 
-BasicEntity::BasicEntity(Mesh* mesh, Material* mat)
-	: EntityInterface(mesh, mat)
+BasicEntity::BasicEntity(Mesh* mesh, ColliderMesh* cmesh, Material* mat)
+	: EntityInterface(mesh, mat, ColliderType::Rigidbody, cmesh)
 {
 }
 

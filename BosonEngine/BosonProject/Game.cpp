@@ -19,8 +19,9 @@ HRESULT Game::Init()
 	if (FAILED(result)) return result;
 
 	Mesh* mesh = assetManager.GetMesh("cube.obj");
+	ColliderMesh* cmesh = assetManager.GetColliderMesh("cube.obj");
 	Material* mat = assetManager.GetMaterial("base");
-	objs["test"] = (EntityInterface*)new BasicEntity(mesh, mat);
+	objs["test"] = (EntityInterface*)new BasicEntity(mesh, cmesh, mat);
 
 	return S_OK;
 }
@@ -28,7 +29,8 @@ HRESULT Game::Init()
 void Game::Update()
 {
 	camera->update(0.001f);
-	//GraphicsCore::testCamera();
+
+	collisionManager.CheckCollisions();
 }
 
 void Game::Draw()

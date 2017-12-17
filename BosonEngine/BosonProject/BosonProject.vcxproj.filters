@@ -75,6 +75,9 @@
     <ClCompile Include="Collision.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionTypes.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowsManager.h">
