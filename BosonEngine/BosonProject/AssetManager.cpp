@@ -13,6 +13,11 @@ AssetManager::~AssetManager()
 		if (i->second != nullptr)
 			delete i->second;
 	}
+	/*for (auto i = m_colmeshes.begin(); i != m_colmeshes.end(); i++)
+	{
+		if (i->second != nullptr)
+			delete i->second;
+	}*/
 	for (auto i = m_materials.begin(); i != m_materials.end(); i++)
 	{
 		if (i->second != nullptr)
@@ -117,7 +122,7 @@ Mesh* AssetManager::GetMesh(std::string mesh)
 	return m_meshes[mesh];
 }
 
-ColliderMesh * AssetManager::GetColliderMesh(std::string name)
+ColliderMesh AssetManager::GetColliderMesh(std::string name)
 {
 	return m_colmeshes[name];
 }
@@ -351,7 +356,7 @@ void AssetManager::CreateMesh(std::string objFile, ID3D11Device* device)
 
 	//CalculateTangents(&verts[0], verts.size(), &indices[0], indices.size());
 	
-	ColliderMesh* cmesh = ColliderMeshFunctions::computeColliderMesh(mType, verts);
+	ColliderMesh cmesh = ColliderMeshFunctions::computeColliderMesh(mType, verts);
 	m_colmeshes[objFile] = cmesh;
 
 	//right here we need to create the vertex buffer and the index buffer

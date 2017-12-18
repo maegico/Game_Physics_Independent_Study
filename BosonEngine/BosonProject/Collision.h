@@ -18,8 +18,8 @@ namespace Collision
 	bool OBB_OBB(Collider a, Collider b);
 
 	//for ARBB
-	bool realignAABB(Collider col);
-	bool realignAllAABBs();
+	//bool realignAABB(Collider col);
+	//bool realignAllAABBs();
 
 	/*bool computeAABB(Collider collider);
 	bool computeOBB(Collider collider);

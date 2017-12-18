@@ -35,8 +35,8 @@ protected:
 	void Quit();
 	virtual void OnResize(unsigned int width, unsigned int height);
 	
-	virtual HRESULT Init() = 0;
-	virtual void Update() = 0;
+	virtual HRESULT Init();
+	virtual void Update();
 	virtual void Draw();
 
 	void ClearBackAndDepthBuffers();

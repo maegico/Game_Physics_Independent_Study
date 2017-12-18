@@ -230,18 +230,51 @@ void GraphicsCore::OnResize(unsigned int width, unsigned int height)
 	immContext->RSSetViewports(1, &viewport);
 }
 
+HRESULT GraphicsCore::Init()
+{
+	for (auto i = objs.begin(); i != objs.end(); i++)
+	{
+		if (i->second != nullptr)
+			i->second->Init();
+	}
+
+	return S_OK;
+}
+
+void GraphicsCore::Update()
+{
+	camera->update(0.01f);
+
+	for (auto i = objs.begin(); i != objs.end(); i++)
+	{
+		if (i->second != nullptr)
+			i->second->Update(0.01f);
+	}
+}
+
 void GraphicsCore::Draw()
 {
 	for (auto i = objs.begin(); i != objs.end(); i++)
 	{
 		if (i->second != nullptr)
 		{
-			DirectX::XMFLOAT4X4 identity;
-			DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
+			//DirectX::XMFLOAT4X4 identity;
+			//DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
 			//matrices = { identity, identity, identity };
 			
+			//calculate model matrix here
+			DirectX::XMFLOAT4X4 worldMat;
+			DirectX::XMVECTOR tempPosition = DirectX::XMLoadFloat3(&(i->second->transform.position));;
+			DirectX::XMVECTOR tempRotation = DirectX::XMLoadFloat3(&i->second->transform.rotation);
+			DirectX::XMVECTOR tempScale = DirectX::XMLoadFloat3(&i->second->transform.scale);
+			DirectX::XMMATRIX modelMat;
+
+			modelMat = DirectX::XMMatrixAffineTransformation(tempScale, DirectX::XMVectorZero(), tempRotation, tempPosition);DirectX::XMMatrixAffineTransformation(tempScale, DirectX::XMVectorZero(), tempRotation, tempPosition);
+
+			DirectX::XMStoreFloat4x4(&worldMat, DirectX::XMMatrixTranspose(modelMat));
+
 			matrices = {
-				identity,
+				worldMat,
 				camera->getViewMatrix(),
 				camera->getProjectionMatrix()
 			};

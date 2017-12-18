@@ -53,10 +53,10 @@ void Camera::update(float deltaTime)
 	DirectX::XMVECTOR updatedRight = DirectX::XMVector3Rotate(uX, quat);
 	DirectX::XMVECTOR updatedUp = DirectX::XMVector3Rotate(uY, quat);
 	
-	if (GetAsyncKeyState('W') & 0x8000) { updatedPos += updatedForward * 2.5f * deltaTime; }
-	if (GetAsyncKeyState('S') & 0x8000) { updatedPos -= updatedForward * 2.5f * deltaTime; }
-	if (GetAsyncKeyState('A') & 0x8000) { updatedPos -= updatedRight * 2.5f * deltaTime; }
-	if (GetAsyncKeyState('D') & 0x8000) { updatedPos += updatedRight * 2.5f * deltaTime; }
+	if (GetAsyncKeyState('W') & 0x8000) { updatedPos += updatedForward * .25f * deltaTime; }
+	if (GetAsyncKeyState('S') & 0x8000) { updatedPos -= updatedForward * .25f * deltaTime; }
+	if (GetAsyncKeyState('A') & 0x8000) { updatedPos -= updatedRight * .25f * deltaTime; }
+	if (GetAsyncKeyState('D') & 0x8000) { updatedPos += updatedRight * .25f * deltaTime; }
 
 	DirectX::XMMATRIX view = DirectX::XMMatrixLookToLH(updatedPos, updatedForward, uY);
 

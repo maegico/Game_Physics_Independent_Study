@@ -7,6 +7,7 @@ using namespace DirectX;
 
 Collision::CollisionSystem::CollisionSystem()
 {
+	idCount = 0;
 }
 
 Collision::CollisionSystem::~CollisionSystem()
@@ -19,7 +20,7 @@ void Collision::CollisionSystem::BatchCollider(Collider& collider)
 
 	//ids don't work
 	//need to make it, so the show collider type & mesh type 
-	collider.setID(++idCount);
+	collider.setID(idCount++);
 	switch (collider.getColliderType())
 	{
 	case ColliderType::Static:
@@ -83,7 +84,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for(int j = 0; j < rgdbdyAABBSize; j++)
 		{
 			if (AABB_AABB(staticAABB[i], rgdbdyAABB[j]))
-				rgdbdyAABB[i].onCollision();
+				if(rgdbdyAABB[i].onCollision != nullptr) rgdbdyAABB[i].onCollision();
 		}
 	}
 
@@ -92,7 +93,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyOBBSize; j++)
 		{
 			if (AABB_OBB(staticAABB[i], rgdbdyOBB[j]))
-				rgdbdyOBB[i].onCollision();
+				if (rgdbdyOBB[i].onCollision != nullptr) rgdbdyOBB[i].onCollision();
 		}
 	}
 
@@ -101,7 +102,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdySphereSize; j++)
 		{
 			if (Sphere_AABB(rgdbdySphere[j], staticAABB[i]))
-				rgdbdySphere[i].onCollision();
+				if (rgdbdySphere[i].onCollision != nullptr) rgdbdySphere[i].onCollision();
 		}
 	}
 
@@ -112,7 +113,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyAABBSize; j++)
 		{
 			if (AABB_OBB(rgdbdyAABB[j], staticOBB[i]))
-				rgdbdyAABB[i].onCollision();
+				if (rgdbdyAABB[i].onCollision != nullptr) rgdbdyAABB[i].onCollision();
 		}
 	}
 
@@ -121,7 +122,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyOBBSize; j++)
 		{
 			if (OBB_OBB(staticOBB[i], rgdbdyOBB[j]))
-				rgdbdyOBB[i].onCollision();
+				if (rgdbdyOBB[i].onCollision != nullptr) rgdbdyOBB[i].onCollision();
 		}
 	}
 
@@ -130,7 +131,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdySphereSize; j++)
 		{
 			if (Sphere_OBB(rgdbdySphere[j], staticOBB[i]))
-				rgdbdySphere[i].onCollision();
+				if (rgdbdySphere[i].onCollision != nullptr) rgdbdySphere[i].onCollision();
 		}
 	}
 
@@ -141,7 +142,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyAABBSize; j++)
 		{
 			if (Sphere_AABB(staticSphere[i], rgdbdyAABB[j]))
-				rgdbdyAABB[i].onCollision();
+				if (rgdbdyAABB[i].onCollision != nullptr) rgdbdyAABB[i].onCollision();
 		}
 	}
 
@@ -150,7 +151,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyOBBSize; j++)
 		{
 			if (Sphere_OBB(staticSphere[i], rgdbdyOBB[j]))
-				rgdbdyOBB[i].onCollision();
+				if (rgdbdyOBB[i].onCollision != nullptr) rgdbdyOBB[i].onCollision();
 		}
 	}
 
@@ -159,7 +160,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdySphereSize; j++)
 		{
 			if (Sphere_Sphere(rgdbdySphere[j], staticSphere[i]))
-				rgdbdySphere[i].onCollision();
+				if (rgdbdySphere[i].onCollision != nullptr) rgdbdySphere[i].onCollision();
 		}
 	}
 
@@ -173,8 +174,8 @@ void Collision::CollisionSystem::CheckCollisions()
 			{
 				if (AABB_AABB(rgdbdyAABB[i], rgdbdyAABB[j]))
 				{
-					rgdbdyAABB[i].onCollision();
-					rgdbdyAABB[j].onCollision();
+					if (rgdbdyAABB[i].onCollision != nullptr) rgdbdyAABB[i].onCollision();
+					if (rgdbdyAABB[j].onCollision != nullptr) rgdbdyAABB[j].onCollision();
 				}
 			}
 		}
@@ -186,11 +187,11 @@ void Collision::CollisionSystem::CheckCollisions()
 		{
 			for (int j = i + 1; j < rgdbdyOBBSize; j++)
 			{
-				if (Sphere_OBB(rgdbdyOBB[i], rgdbdyOBB[j]))
+				if (OBB_OBB(rgdbdyOBB[i], rgdbdyOBB[j]))
 
 				{
-					rgdbdyOBB[i].onCollision();
-					rgdbdyOBB[j].onCollision();
+					if (rgdbdyOBB[i].onCollision != nullptr) rgdbdyOBB[i].onCollision();
+					if (rgdbdyOBB[j].onCollision != nullptr) rgdbdyOBB[j].onCollision();
 				}
 			}
 		}
@@ -204,8 +205,8 @@ void Collision::CollisionSystem::CheckCollisions()
 			{
 				if (Sphere_Sphere(rgdbdySphere[i], rgdbdySphere[j]))
 				{
-					rgdbdySphere[i].onCollision();
-					rgdbdySphere[j].onCollision();
+					if (rgdbdySphere[i].onCollision != nullptr) rgdbdySphere[i].onCollision();
+					if (rgdbdySphere[j].onCollision != nullptr) rgdbdySphere[j].onCollision();
 				}
 			}
 		}
@@ -214,7 +215,6 @@ void Collision::CollisionSystem::CheckCollisions()
 
 bool Collision::Sphere_AABB(Collider sphere, Collider aabb)
 {
-
 	return false;
 }
 
@@ -223,8 +223,17 @@ bool Collision::Sphere_Sphere(Collider a, Collider b)
 	//vec1 = center
 	//vec2.x = radius
 	float distance;
-	ColliderMesh a1 = *a.getMesh();
-	ColliderMesh a2 = *b.getMesh();
+	ColliderMesh a1 = a.getMesh();
+	ColliderMesh a2 = b.getMesh();
+
+	a1.vec1.x += a.transform.position.x;
+	a1.vec1.y += a.transform.position.y;
+	a1.vec1.z += a.transform.position.z;
+
+	a2.vec1.x += b.transform.position.x;
+	a2.vec1.y += b.transform.position.y;
+	a2.vec1.z += b.transform.position.z;
+
 	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.vec1);
 	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.vec1);
 	DirectX::XMVECTOR length = DirectX::XMVector3Length(c1 - c2);
@@ -241,8 +250,25 @@ bool Collision::Sphere_OBB(Collider sphere, Collider obb)
 bool Collision::AABB_AABB(Collider a, Collider b)
 {
 	//vec1 = min, vec2 = max
-	ColliderMesh a1 = *a.getMesh();
-	ColliderMesh a2 = *b.getMesh();
+	ColliderMesh a1 = a.getMesh();
+	ColliderMesh a2 = b.getMesh();
+
+	a1.vec1.x += a.transform.position.x;
+	a1.vec1.y += a.transform.position.y;
+	a1.vec1.z += a.transform.position.z;
+
+	a1.vec2.x += a.transform.position.x;
+	a1.vec2.y += a.transform.position.y;
+	a1.vec2.z += a.transform.position.z;
+
+	a2.vec1.x += b.transform.position.x;
+	a2.vec1.y += b.transform.position.y;
+	a2.vec1.z += b.transform.position.z;
+
+	a2.vec2.x += b.transform.position.x;
+	a2.vec2.y += b.transform.position.y;
+	a2.vec2.z += b.transform.position.z;
+
 	if (a1.vec2.x < a1.vec1.x || a1.vec1.x > a2.vec2.x) return 0;
 	if (a1.vec2.y < a1.vec1.y || a1.vec1.y > a2.vec2.y) return 0;
 	if (a1.vec2.z < a1.vec1.z || a1.vec1.z > a2.vec2.z) return 0;
@@ -252,16 +278,22 @@ bool Collision::AABB_AABB(Collider a, Collider b)
 //Collider a = AABB, Collider b = OBB
 bool Collision::AABB_OBB(Collider aabb, Collider obb)
 {
-	//ColliderMesh a1 = *aabb.getMesh();
-	//ColliderMesh a2 = *obb.getMesh();
 	return false;
 }
 
 bool Collision::OBB_OBB(Collider a, Collider b)
 {
 	//SAT
-	ColliderMesh a1 = *a.getMesh();
-	ColliderMesh a2 = *b.getMesh();
+	ColliderMesh a1 = a.getMesh();
+	ColliderMesh a2 = b.getMesh();
+
+	a1.vec1.x += a.transform.position.x;
+	a1.vec1.y += a.transform.position.y;
+	a1.vec1.z += a.transform.position.z;
+
+	a2.vec1.x += b.transform.position.x;
+	a2.vec1.y += b.transform.position.y;
+	a2.vec1.z += b.transform.position.z;
 
 	float ra, rb;
 	DirectX::XMFLOAT3X3 r, absR;

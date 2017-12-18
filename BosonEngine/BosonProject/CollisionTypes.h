@@ -34,5 +34,5 @@ namespace ColliderMeshFunctions
 	using namespace DirectX;
 
 	DirectX::XMFLOAT3 halfpoint(DirectX::XMFLOAT3 vec1, DirectX::XMFLOAT3 vec2);
-	ColliderMesh* computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertArray);
+	ColliderMesh computeColliderMesh(MeshType meshType, std::vector<Vertex>& vertArray);
 }

@@ -36,7 +36,7 @@ public:
 	Material* LoadCubeMapMaterial(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName);
 	Material* LoadPostProcessingMaterial(std::string name, std::string samplerName, std::string vs, std::string ps);*/
 	Mesh* GetMesh(std::string);
-	ColliderMesh* GetColliderMesh(std::string);
+	ColliderMesh GetColliderMesh(std::string);
 	Material* GetMaterial(std::string);
 
 private:
@@ -47,7 +47,7 @@ private:
 	std::unordered_map<std::string, VertexShader*>	m_vshaders;	//List of vertex shaders
 	std::unordered_map<std::string, PixelShader*> m_pshaders;	//List of pixel shaders
 	std::unordered_map<std::string, Material*>	m_materials;//List of materials
-	std::unordered_map<std::string, ColliderMesh*> m_colmeshes;
+	std::unordered_map<std::string, ColliderMesh> m_colmeshes;
 
 	//Calculate the Tangents
 	//void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices);

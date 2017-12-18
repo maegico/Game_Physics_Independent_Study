@@ -9,19 +9,20 @@ class Collider
 {
 public:
 	bool inUse;
+	Transform& transform;
 
-	Collider(ColliderType colliderType, ColliderMesh* cmesh, Transform& transform);
+	Collider(ColliderType colliderType, ColliderMesh cmesh, Transform& transform);
 	~Collider();
 
 	ColliderType getColliderType();
 	MeshType getMeshType();
-	ColliderMesh* getMesh();
+	ColliderMesh getMesh();
+	void setMesh(ColliderMesh cmesh);
 	void setID(int id);
 	int getID();
 	void(*onCollision)();
 private:
 	ColliderType colType;
-	Transform& transform;
-	ColliderMesh* mesh;
+	ColliderMesh mesh;
 	int id;
 };
