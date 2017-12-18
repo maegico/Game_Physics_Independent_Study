@@ -11,7 +11,7 @@ public:
 		: mesh(mesh), mat(mat), collider(colType, cmesh, transform)
 	{
 		transform = { DirectX::XMFLOAT3(0,0,1), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0),
-			DirectX::XMFLOAT3(1,1,1), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), 1 };
+			DirectX::XMFLOAT3(1,1,1), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), 1 };
 	}
 
 	~EntityInterface() { delete mesh; }
@@ -54,6 +54,7 @@ public:
 			transform.velocity = DirectX::XMFLOAT3(0, 0, 0);
 			transform.acceleration = DirectX::XMFLOAT3(0, 0, 0);
 		}
+		transform.prevForce = transform.force;
 		transform.force = DirectX::XMFLOAT3(0, 0, 0);
 	}
 

@@ -16,6 +16,8 @@ namespace Collision
 	bool AABB_AABB(Collider a, Collider b);
 	bool AABB_OBB(Collider a, Collider b);
 	bool OBB_OBB(Collider a, Collider b);
+	bool SBSphere_Sphere(Collider a, Collider b);
+	bool SBSphere_SBSphere(Collider a, Collider b);
 
 	//for ARBB
 	//bool realignAABB(Collider col);

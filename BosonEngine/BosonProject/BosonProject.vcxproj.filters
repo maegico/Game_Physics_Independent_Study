@@ -154,5 +154,8 @@
     <FxCompile Include="Assets\VShaders\VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="Assets\VShaders\SoftBodyVShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

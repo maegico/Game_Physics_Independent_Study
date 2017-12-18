@@ -13,6 +13,8 @@ struct Transform
 	DirectX::XMFLOAT3 scale;
 	//force acting on this object
 	DirectX::XMFLOAT3 force;
+	//last force that acted on this object
+	DirectX::XMFLOAT3 prevForce;
 	//acceleration of this object
 	DirectX::XMFLOAT3 acceleration;
 	//velocity of this object

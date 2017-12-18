@@ -13,11 +13,6 @@ AssetManager::~AssetManager()
 		if (i->second != nullptr)
 			delete i->second;
 	}
-	/*for (auto i = m_colmeshes.begin(); i != m_colmeshes.end(); i++)
-	{
-		if (i->second != nullptr)
-			delete i->second;
-	}*/
 	for (auto i = m_materials.begin(); i != m_materials.end(); i++)
 	{
 		if (i->second != nullptr)
@@ -49,9 +44,6 @@ AssetManager::~AssetManager()
 
 void AssetManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 {
-	/*device->AddRef();
-	context->AddRef();*/
-
 	m_materials = std::unordered_map<std::string, Material*>();
 	m_meshes = std::unordered_map<std::string, Mesh*>();
 	m_samplers = std::unordered_map<std::string, ID3D11SamplerState*>();
@@ -96,9 +88,7 @@ void AssetManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 	}
 
 	LoadMaterial("base", "sampler", "VertexShader.cso", "PixelShader.cso", "");
-
-	/*context->Release();
-	device->Release();*/
+	LoadMaterial("base", "sampler", "SoftBodyVShader.cso", "PixelShader.cso", "");
 }
 
 Material* AssetManager::LoadMaterial(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName)

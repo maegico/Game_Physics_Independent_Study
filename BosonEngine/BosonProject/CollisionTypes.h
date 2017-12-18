@@ -7,7 +7,8 @@ enum MeshType
 {
 	Sphere,
 	AABB,
-	OBB
+	OBB,
+	SBSphere	//Stands for Soft Body Sphere
 };
 
 enum ColliderType

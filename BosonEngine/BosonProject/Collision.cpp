@@ -234,9 +234,11 @@ bool Collision::Sphere_Sphere(Collider a, Collider b)
 	a2.vec1.y += b.transform.position.y;
 	a2.vec1.z += b.transform.position.z;
 
-	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.vec1);
-	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.vec1);
-	DirectX::XMVECTOR length = DirectX::XMVector3Length(c1 - c2);
+	XMVECTOR c1 = XMLoadFloat3(&a1.vec1);
+	XMVECTOR c2 = XMLoadFloat3(&a2.vec1);
+	XMVECTOR collisionVector = c1 - c2;
+	XMVECTOR length = XMVector3Length(collisionVector);
+	
 	XMStoreFloat(&distance, length);
 
 	return distance < a1.vec2.x + a2.vec2.x;
@@ -409,4 +411,128 @@ bool Collision::OBB_OBB(Collider a, Collider b)
 	if (abs(t.y * r(0, 2) - t.x * r(1, 2)) > ra + rb) return false;
 
 	return true;
+}
+
+bool Collision::SBSphere_Sphere(Collider a, Collider b)
+{
+	//currently just sphere on sphere
+	//need to find the force amount and do other things
+
+	//vec1 = center
+	//vec2.x = radius
+	XMFLOAT3 collisionPoint;	//for soft body
+	float distance;
+	ColliderMesh a1 = a.getMesh();
+	ColliderMesh a2 = b.getMesh();
+	float radiusA = a1.vec2.x;
+
+	a1.vec1.x += a.transform.position.x;
+	a1.vec1.y += a.transform.position.y;
+	a1.vec1.z += a.transform.position.z;
+
+	a2.vec1.x += b.transform.position.x;
+	a2.vec1.y += b.transform.position.y;
+	a2.vec1.z += b.transform.position.z;
+
+	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.vec1);
+	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.vec1);
+	XMVECTOR collisionVector = c1 - c2;
+	DirectX::XMVECTOR length = DirectX::XMVector3Length(collisionVector);
+	XMStoreFloat(&distance, length);
+	XMStoreFloat3(&collisionPoint, -collisionVector);
+
+	//compute the point of collision
+	collisionPoint.x /= distance * radiusA;
+	collisionPoint.y /= distance * radiusA;
+	collisionPoint.z /= distance * radiusA;
+
+	collisionPoint.x += a.transform.position.x;
+	collisionPoint.y += a.transform.position.y;
+	collisionPoint.z += a.transform.position.z;
+
+	
+	ColliderMesh finalMesh = a.getMesh();
+	finalMesh.axes[0] = collisionPoint;
+
+	//compute the force acting on the object currently
+	finalMesh.axes[1].x *= b.transform.mass;
+	finalMesh.axes[1].y *= b.transform.mass;
+	finalMesh.axes[1].z *= b.transform.mass;
+
+	//now I have calculated the collision point of the sphere, need to update them in some way
+
+	return distance < a1.vec2.x + a2.vec2.x;
+}
+
+bool Collision::SBSphere_SBSphere(Collider a, Collider b)
+{
+	//currently just sphere on sphere
+	//need to find the force amount and do other things
+
+	//vec1 = center
+	//vec2.x = radius
+	float distance;
+	XMFLOAT3 collisionPointA;
+	XMFLOAT3 collisionPointB;
+	ColliderMesh a1 = a.getMesh();
+	ColliderMesh a2 = b.getMesh();
+
+	float radiusA = a1.vec2.x;
+	float radiusB = a2.vec2.x;
+
+	a1.vec1.x += a.transform.position.x;
+	a1.vec1.y += a.transform.position.y;
+	a1.vec1.z += a.transform.position.z;
+
+	a2.vec1.x += b.transform.position.x;
+	a2.vec1.y += b.transform.position.y;
+	a2.vec1.z += b.transform.position.z;
+
+	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.vec1);
+	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.vec1);
+	XMVECTOR collisionVector = c1 - c2;
+	DirectX::XMVECTOR length = DirectX::XMVector3Length(collisionVector);
+	XMStoreFloat(&distance, length);
+	XMStoreFloat3(&collisionPointB, collisionVector);
+	XMStoreFloat3(&collisionPointA, -collisionVector);
+
+	//compute the point of collision
+
+	collisionPointA.x /= distance * radiusA;
+	collisionPointA.y /= distance * radiusA;
+	collisionPointA.z /= distance * radiusA;
+
+	collisionPointB.x /= distance * radiusB;
+	collisionPointB.y /= distance * radiusB;
+	collisionPointB.z /= distance * radiusB;
+
+	collisionPointA.x += a.transform.position.x;
+	collisionPointA.y += a.transform.position.y;
+	collisionPointA.z += a.transform.position.z;
+
+	collisionPointB.x += b.transform.position.x;
+	collisionPointB.y += b.transform.position.y;
+	collisionPointB.z += b.transform.position.z;
+
+	ColliderMesh finalMeshA = a.getMesh();
+	ColliderMesh finalMeshB = b.getMesh();
+
+	finalMeshA.axes[0] = collisionPointA;
+	finalMeshB.axes[0] = collisionPointB;
+
+	finalMeshA.axes[1] = b.transform.acceleration;
+	finalMeshB.axes[1] = a.transform.acceleration;
+	
+	//compute the force acting on the object currently
+	finalMeshA.axes[1].x *= b.transform.mass;
+	finalMeshA.axes[1].y *= b.transform.mass;
+	finalMeshA.axes[1].z *= b.transform.mass;
+	
+	finalMeshB.axes[1].x *= a.transform.mass;
+	finalMeshB.axes[1].y *= a.transform.mass;
+	finalMeshB.axes[1].z *= a.transform.mass;
+
+	//now I have calculated the collision point of the sphere, need to update them in some way
+
+	return distance < a1.vec2.x + a2.vec2.x;
 }
