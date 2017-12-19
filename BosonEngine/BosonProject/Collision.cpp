@@ -478,11 +478,23 @@ bool Collision::SBSphere_Sphere(Collider* a, Collider* b)
 	XMStoreFloat(&distance, length);
 	XMStoreFloat3(&collisionPoint, -collisionVector);
 
+	ColliderMesh finalMesh = a->getMesh();
 	bool collide = distance < a1.vec2.x + a2.vec2.x;
 	if (collide != true)
-		return false;
+	{
+		finalMesh.axes[0] = collisionPoint;
+		finalMesh.axes[1].x *= 0.99;
+		finalMesh.axes[1].y *= 0.99;
+		finalMesh.axes[1].z *= 0.99;
+		if (finalMesh.axes[1].x < 0.01) finalMesh.axes[1].x = 0;
+		if (finalMesh.axes[1].y < 0.01) finalMesh.axes[1].y = 0;
+		if (finalMesh.axes[1].z < 0.01) finalMesh.axes[1].z = 0;
 
-	ColliderMesh finalMesh = a->getMesh();
+		a->setMesh(finalMesh);
+		return collide;
+	}
+
+	
 
 	//compute the point of collision
 	collisionPoint.x /= distance * radiusA;
@@ -498,14 +510,14 @@ bool Collision::SBSphere_Sphere(Collider* a, Collider* b)
 
 	//compute the force acting on the object currently
 	//need to divide by -k (need to be negative?)
-	finalMesh.axes[1].x *= b->transform.mass / -1;
-	finalMesh.axes[1].y *= b->transform.mass / -1;
-	finalMesh.axes[1].z *= b->transform.mass / -1;
+	finalMesh.axes[1].x *= b->transform.mass / 1;
+	finalMesh.axes[1].y *= b->transform.mass / 1;
+	finalMesh.axes[1].z *= b->transform.mass / 1;
 
 	//update the mesh with the collision point and the deformation vector
 	a->setMesh(finalMesh);
 
-	return true;
+	return collide;
 }
 
 bool Collision::SBSphere_SBSphere(Collider* a, Collider* b)
