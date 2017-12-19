@@ -14,17 +14,17 @@ Collision::CollisionSystem::~CollisionSystem()
 {
 }
 
-void Collision::CollisionSystem::BatchCollider(Collider& collider)
+void Collision::CollisionSystem::BatchCollider(Collider* collider)
 {
-	if (collider.getID() != -1) return;
+	if (collider->getID() != -1) return;
 
 	//ids don't work
 	//need to make it, so the show collider type & mesh type 
-	collider.setID(idCount++);
-	switch (collider.getColliderType())
+	collider->setID(idCount++);
+	switch (collider->getColliderType())
 	{
 	case ColliderType::Static:
-		switch (collider.getMeshType())
+		switch (collider->getMeshType())
 		{
 		case MeshType::AABB:
 			staticAABB.push_back(collider);
@@ -35,9 +35,12 @@ void Collision::CollisionSystem::BatchCollider(Collider& collider)
 		case MeshType::Sphere:
 			staticSphere.push_back(collider);
 			break;
+		case MeshType::SBSphere:
+			staticSBSphere.push_back(collider);
+			break;
 		}
 	case ColliderType::Rigidbody:
-		switch (collider.getMeshType())
+		switch (collider->getMeshType())
 		{
 		case MeshType::AABB:
 			rgdbdyAABB.push_back(collider);
@@ -47,6 +50,9 @@ void Collision::CollisionSystem::BatchCollider(Collider& collider)
 			break;
 		case MeshType::Sphere:
 			rgdbdySphere.push_back(collider);
+			break;
+		case MeshType::SBSphere:
+			rgdbdySBSphere.push_back(collider);
 			break;
 		}
 	default:
@@ -74,17 +80,19 @@ void Collision::CollisionSystem::CheckCollisions()
 	int staticAABBSize = staticAABB.size();
 	int staticOBBSize = staticOBB.size();
 	int staticSphereSize = staticSphere.size();
+	int staticSBSphereSize = staticSBSphere.size();
 
 	int rgdbdyAABBSize = rgdbdyAABB.size();
 	int rgdbdyOBBSize = rgdbdyOBB.size();
 	int rgdbdySphereSize = rgdbdySphere.size();
+	int rgdbdySBSphereSize = rgdbdySBSphere.size();
 
 	for (int i = 0; i < staticAABBSize; i++)
 	{
 		for(int j = 0; j < rgdbdyAABBSize; j++)
 		{
 			if (AABB_AABB(staticAABB[i], rgdbdyAABB[j]))
-				if(rgdbdyAABB[i].onCollision != nullptr) rgdbdyAABB[i].onCollision();
+				if(rgdbdyAABB[i]->onCollision != nullptr) rgdbdyAABB[i]->onCollision();
 		}
 	}
 
@@ -93,7 +101,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyOBBSize; j++)
 		{
 			if (AABB_OBB(staticAABB[i], rgdbdyOBB[j]))
-				if (rgdbdyOBB[i].onCollision != nullptr) rgdbdyOBB[i].onCollision();
+				if (rgdbdyOBB[i]->onCollision != nullptr) rgdbdyOBB[i]->onCollision();
 		}
 	}
 
@@ -102,7 +110,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdySphereSize; j++)
 		{
 			if (Sphere_AABB(rgdbdySphere[j], staticAABB[i]))
-				if (rgdbdySphere[i].onCollision != nullptr) rgdbdySphere[i].onCollision();
+				if (rgdbdySphere[i]->onCollision != nullptr) rgdbdySphere[i]->onCollision();
 		}
 	}
 
@@ -113,7 +121,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyAABBSize; j++)
 		{
 			if (AABB_OBB(rgdbdyAABB[j], staticOBB[i]))
-				if (rgdbdyAABB[i].onCollision != nullptr) rgdbdyAABB[i].onCollision();
+				if (rgdbdyAABB[i]->onCollision != nullptr) rgdbdyAABB[i]->onCollision();
 		}
 	}
 
@@ -122,7 +130,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyOBBSize; j++)
 		{
 			if (OBB_OBB(staticOBB[i], rgdbdyOBB[j]))
-				if (rgdbdyOBB[i].onCollision != nullptr) rgdbdyOBB[i].onCollision();
+				if (rgdbdyOBB[i]->onCollision != nullptr) rgdbdyOBB[i]->onCollision();
 		}
 	}
 
@@ -131,7 +139,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdySphereSize; j++)
 		{
 			if (Sphere_OBB(rgdbdySphere[j], staticOBB[i]))
-				if (rgdbdySphere[i].onCollision != nullptr) rgdbdySphere[i].onCollision();
+				if (rgdbdySphere[i]->onCollision != nullptr) rgdbdySphere[i]->onCollision();
 		}
 	}
 
@@ -142,7 +150,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyAABBSize; j++)
 		{
 			if (Sphere_AABB(staticSphere[i], rgdbdyAABB[j]))
-				if (rgdbdyAABB[i].onCollision != nullptr) rgdbdyAABB[i].onCollision();
+				if (rgdbdyAABB[i]->onCollision != nullptr) rgdbdyAABB[i]->onCollision();
 		}
 	}
 
@@ -151,7 +159,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdyOBBSize; j++)
 		{
 			if (Sphere_OBB(staticSphere[i], rgdbdyOBB[j]))
-				if (rgdbdyOBB[i].onCollision != nullptr) rgdbdyOBB[i].onCollision();
+				if (rgdbdyOBB[i]->onCollision != nullptr) rgdbdyOBB[i]->onCollision();
 		}
 	}
 
@@ -160,7 +168,7 @@ void Collision::CollisionSystem::CheckCollisions()
 		for (int j = 0; j < rgdbdySphereSize; j++)
 		{
 			if (Sphere_Sphere(rgdbdySphere[j], staticSphere[i]))
-				if (rgdbdySphere[i].onCollision != nullptr) rgdbdySphere[i].onCollision();
+				if (rgdbdySphere[i]->onCollision != nullptr) rgdbdySphere[i]->onCollision();
 		}
 	}
 
@@ -174,8 +182,8 @@ void Collision::CollisionSystem::CheckCollisions()
 			{
 				if (AABB_AABB(rgdbdyAABB[i], rgdbdyAABB[j]))
 				{
-					if (rgdbdyAABB[i].onCollision != nullptr) rgdbdyAABB[i].onCollision();
-					if (rgdbdyAABB[j].onCollision != nullptr) rgdbdyAABB[j].onCollision();
+					if (rgdbdyAABB[i]->onCollision != nullptr) rgdbdyAABB[i]->onCollision();
+					if (rgdbdyAABB[j]->onCollision != nullptr) rgdbdyAABB[j]->onCollision();
 				}
 			}
 		}
@@ -190,8 +198,8 @@ void Collision::CollisionSystem::CheckCollisions()
 				if (OBB_OBB(rgdbdyOBB[i], rgdbdyOBB[j]))
 
 				{
-					if (rgdbdyOBB[i].onCollision != nullptr) rgdbdyOBB[i].onCollision();
-					if (rgdbdyOBB[j].onCollision != nullptr) rgdbdyOBB[j].onCollision();
+					if (rgdbdyOBB[i]->onCollision != nullptr) rgdbdyOBB[i]->onCollision();
+					if (rgdbdyOBB[j]->onCollision != nullptr) rgdbdyOBB[j]->onCollision();
 				}
 			}
 		}
@@ -205,34 +213,63 @@ void Collision::CollisionSystem::CheckCollisions()
 			{
 				if (Sphere_Sphere(rgdbdySphere[i], rgdbdySphere[j]))
 				{
-					if (rgdbdySphere[i].onCollision != nullptr) rgdbdySphere[i].onCollision();
-					if (rgdbdySphere[j].onCollision != nullptr) rgdbdySphere[j].onCollision();
+					if (rgdbdySphere[i]->onCollision != nullptr) rgdbdySphere[i]->onCollision();
+					if (rgdbdySphere[j]->onCollision != nullptr) rgdbdySphere[j]->onCollision();
+				}
+			}
+		}
+	}
+
+	if (rgdbdySBSphereSize != 0 || rgdbdySphereSize != 0)
+	{
+		for (int i = 0; i < rgdbdySBSphereSize; i++)
+		{
+			for (int j = i; j < rgdbdySphereSize; j++)
+			{
+				if (SBSphere_Sphere(rgdbdySBSphere[i], rgdbdySphere[j]))
+				{
+					if (rgdbdySBSphere[i]->onCollision != nullptr) rgdbdySphere[i]->onCollision();
+					if (rgdbdySphere[j]->onCollision != nullptr) rgdbdySphere[j]->onCollision();
+				}
+			}
+		}
+	}
+	if (rgdbdySBSphereSize != 0)
+	{
+		for (int i = 0; i < rgdbdySBSphereSize - 1; i++)
+		{
+			for (int j = i + 1; j < rgdbdySBSphereSize; j++)
+			{
+				if (Sphere_Sphere(rgdbdySBSphere[i], rgdbdySBSphere[j]))
+				{
+					if (rgdbdySBSphere[i]->onCollision != nullptr) rgdbdySphere[i]->onCollision();
+					if (rgdbdySBSphere[j]->onCollision != nullptr) rgdbdySphere[j]->onCollision();
 				}
 			}
 		}
 	}
 }
 
-bool Collision::Sphere_AABB(Collider sphere, Collider aabb)
+bool Collision::Sphere_AABB(Collider* a, Collider* b)
 {
 	return false;
 }
 
-bool Collision::Sphere_Sphere(Collider a, Collider b)
+bool Collision::Sphere_Sphere(Collider* a, Collider* b)
 {
 	//vec1 = center
 	//vec2.x = radius
 	float distance;
-	ColliderMesh a1 = a.getMesh();
-	ColliderMesh a2 = b.getMesh();
+	ColliderMesh a1 = a->getMesh();
+	ColliderMesh a2 = b->getMesh();
 
-	a1.vec1.x += a.transform.position.x;
-	a1.vec1.y += a.transform.position.y;
-	a1.vec1.z += a.transform.position.z;
+	a1.vec1.x += a->transform.position.x;
+	a1.vec1.y += a->transform.position.y;
+	a1.vec1.z += a->transform.position.z;
 
-	a2.vec1.x += b.transform.position.x;
-	a2.vec1.y += b.transform.position.y;
-	a2.vec1.z += b.transform.position.z;
+	a2.vec1.x += b->transform.position.x;
+	a2.vec1.y += b->transform.position.y;
+	a2.vec1.z += b->transform.position.z;
 
 	XMVECTOR c1 = XMLoadFloat3(&a1.vec1);
 	XMVECTOR c2 = XMLoadFloat3(&a2.vec1);
@@ -244,32 +281,32 @@ bool Collision::Sphere_Sphere(Collider a, Collider b)
 	return distance < a1.vec2.x + a2.vec2.x;
 }
 
-bool Collision::Sphere_OBB(Collider sphere, Collider obb)
+bool Collision::Sphere_OBB(Collider* a, Collider* b)
 {
 	return false;
 }
 
-bool Collision::AABB_AABB(Collider a, Collider b)
+bool Collision::AABB_AABB(Collider* a, Collider* b)
 {
 	//vec1 = min, vec2 = max
-	ColliderMesh a1 = a.getMesh();
-	ColliderMesh a2 = b.getMesh();
+	ColliderMesh a1 = a->getMesh();
+	ColliderMesh a2 = b->getMesh();
 
-	a1.vec1.x += a.transform.position.x;
-	a1.vec1.y += a.transform.position.y;
-	a1.vec1.z += a.transform.position.z;
+	a1.vec1.x += a->transform.position.x;
+	a1.vec1.y += a->transform.position.y;
+	a1.vec1.z += a->transform.position.z;
 
-	a1.vec2.x += a.transform.position.x;
-	a1.vec2.y += a.transform.position.y;
-	a1.vec2.z += a.transform.position.z;
+	a1.vec2.x += a->transform.position.x;
+	a1.vec2.y += a->transform.position.y;
+	a1.vec2.z += a->transform.position.z;
 
-	a2.vec1.x += b.transform.position.x;
-	a2.vec1.y += b.transform.position.y;
-	a2.vec1.z += b.transform.position.z;
+	a2.vec1.x += b->transform.position.x;
+	a2.vec1.y += b->transform.position.y;
+	a2.vec1.z += b->transform.position.z;
 
-	a2.vec2.x += b.transform.position.x;
-	a2.vec2.y += b.transform.position.y;
-	a2.vec2.z += b.transform.position.z;
+	a2.vec2.x += b->transform.position.x;
+	a2.vec2.y += b->transform.position.y;
+	a2.vec2.z += b->transform.position.z;
 
 	if (a1.vec2.x < a1.vec1.x || a1.vec1.x > a2.vec2.x) return 0;
 	if (a1.vec2.y < a1.vec1.y || a1.vec1.y > a2.vec2.y) return 0;
@@ -278,24 +315,24 @@ bool Collision::AABB_AABB(Collider a, Collider b)
 }
 
 //Collider a = AABB, Collider b = OBB
-bool Collision::AABB_OBB(Collider aabb, Collider obb)
+bool Collision::AABB_OBB(Collider* a, Collider* b)
 {
 	return false;
 }
 
-bool Collision::OBB_OBB(Collider a, Collider b)
+bool Collision::OBB_OBB(Collider* a, Collider* b)
 {
 	//SAT
-	ColliderMesh a1 = a.getMesh();
-	ColliderMesh a2 = b.getMesh();
+	ColliderMesh a1 = a->getMesh();
+	ColliderMesh a2 = b->getMesh();
 
-	a1.vec1.x += a.transform.position.x;
-	a1.vec1.y += a.transform.position.y;
-	a1.vec1.z += a.transform.position.z;
+	a1.vec1.x += a->transform.position.x;
+	a1.vec1.y += a->transform.position.y;
+	a1.vec1.z += a->transform.position.z;
 
-	a2.vec1.x += b.transform.position.x;
-	a2.vec1.y += b.transform.position.y;
-	a2.vec1.z += b.transform.position.z;
+	a2.vec1.x += b->transform.position.x;
+	a2.vec1.y += b->transform.position.y;
+	a2.vec1.z += b->transform.position.z;
 
 	float ra, rb;
 	DirectX::XMFLOAT3X3 r, absR;
@@ -413,7 +450,7 @@ bool Collision::OBB_OBB(Collider a, Collider b)
 	return true;
 }
 
-bool Collision::SBSphere_Sphere(Collider a, Collider b)
+bool Collision::SBSphere_Sphere(Collider* a, Collider* b)
 {
 	//currently just sphere on sphere
 	//need to find the force amount and do other things
@@ -422,17 +459,17 @@ bool Collision::SBSphere_Sphere(Collider a, Collider b)
 	//vec2.x = radius
 	XMFLOAT3 collisionPoint;	//for soft body
 	float distance;
-	ColliderMesh a1 = a.getMesh();
-	ColliderMesh a2 = b.getMesh();
+	ColliderMesh a1 = a->getMesh();
+	ColliderMesh a2 = b->getMesh();
 	float radiusA = a1.vec2.x;
 
-	a1.vec1.x += a.transform.position.x;
-	a1.vec1.y += a.transform.position.y;
-	a1.vec1.z += a.transform.position.z;
+	a1.vec1.x += a->transform.position.x;
+	a1.vec1.y += a->transform.position.y;
+	a1.vec1.z += a->transform.position.z;
 
-	a2.vec1.x += b.transform.position.x;
-	a2.vec1.y += b.transform.position.y;
-	a2.vec1.z += b.transform.position.z;
+	a2.vec1.x += b->transform.position.x;
+	a2.vec1.y += b->transform.position.y;
+	a2.vec1.z += b->transform.position.z;
 
 	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.vec1);
 	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.vec1);
@@ -441,30 +478,37 @@ bool Collision::SBSphere_Sphere(Collider a, Collider b)
 	XMStoreFloat(&distance, length);
 	XMStoreFloat3(&collisionPoint, -collisionVector);
 
+	bool collide = distance < a1.vec2.x + a2.vec2.x;
+	if (collide != true)
+		return false;
+
+	ColliderMesh finalMesh = a->getMesh();
+
 	//compute the point of collision
 	collisionPoint.x /= distance * radiusA;
 	collisionPoint.y /= distance * radiusA;
 	collisionPoint.z /= distance * radiusA;
 
-	collisionPoint.x += a.transform.position.x;
-	collisionPoint.y += a.transform.position.y;
-	collisionPoint.z += a.transform.position.z;
-
+	collisionPoint.x += a->transform.position.x;
+	collisionPoint.y += a->transform.position.y;
+	collisionPoint.z += a->transform.position.z;
 	
-	ColliderMesh finalMesh = a.getMesh();
 	finalMesh.axes[0] = collisionPoint;
+	finalMesh.axes[1] = b->transform.acceleration;
 
 	//compute the force acting on the object currently
-	finalMesh.axes[1].x *= b.transform.mass;
-	finalMesh.axes[1].y *= b.transform.mass;
-	finalMesh.axes[1].z *= b.transform.mass;
+	//need to divide by -k (need to be negative?)
+	finalMesh.axes[1].x *= b->transform.mass / -1;
+	finalMesh.axes[1].y *= b->transform.mass / -1;
+	finalMesh.axes[1].z *= b->transform.mass / -1;
 
-	//now I have calculated the collision point of the sphere, need to update them in some way
+	//update the mesh with the collision point and the deformation vector
+	a->setMesh(finalMesh);
 
-	return distance < a1.vec2.x + a2.vec2.x;
+	return true;
 }
 
-bool Collision::SBSphere_SBSphere(Collider a, Collider b)
+bool Collision::SBSphere_SBSphere(Collider* a, Collider* b)
 {
 	//currently just sphere on sphere
 	//need to find the force amount and do other things
@@ -474,19 +518,19 @@ bool Collision::SBSphere_SBSphere(Collider a, Collider b)
 	float distance;
 	XMFLOAT3 collisionPointA;
 	XMFLOAT3 collisionPointB;
-	ColliderMesh a1 = a.getMesh();
-	ColliderMesh a2 = b.getMesh();
+	ColliderMesh a1 = a->getMesh();
+	ColliderMesh a2 = b->getMesh();
 
 	float radiusA = a1.vec2.x;
 	float radiusB = a2.vec2.x;
 
-	a1.vec1.x += a.transform.position.x;
-	a1.vec1.y += a.transform.position.y;
-	a1.vec1.z += a.transform.position.z;
+	a1.vec1.x += a->transform.position.x;
+	a1.vec1.y += a->transform.position.y;
+	a1.vec1.z += a->transform.position.z;
 
-	a2.vec1.x += b.transform.position.x;
-	a2.vec1.y += b.transform.position.y;
-	a2.vec1.z += b.transform.position.z;
+	a2.vec1.x += b->transform.position.x;
+	a2.vec1.y += b->transform.position.y;
+	a2.vec1.z += b->transform.position.z;
 
 	DirectX::XMVECTOR c1 = DirectX::XMLoadFloat3(&a1.vec1);
 	DirectX::XMVECTOR c2 = DirectX::XMLoadFloat3(&a2.vec1);
@@ -506,33 +550,37 @@ bool Collision::SBSphere_SBSphere(Collider a, Collider b)
 	collisionPointB.y /= distance * radiusB;
 	collisionPointB.z /= distance * radiusB;
 
-	collisionPointA.x += a.transform.position.x;
-	collisionPointA.y += a.transform.position.y;
-	collisionPointA.z += a.transform.position.z;
+	collisionPointA.x += a->transform.position.x;
+	collisionPointA.y += a->transform.position.y;
+	collisionPointA.z += a->transform.position.z;
 
-	collisionPointB.x += b.transform.position.x;
-	collisionPointB.y += b.transform.position.y;
-	collisionPointB.z += b.transform.position.z;
+	collisionPointB.x += b->transform.position.x;
+	collisionPointB.y += b->transform.position.y;
+	collisionPointB.z += b->transform.position.z;
 
-	ColliderMesh finalMeshA = a.getMesh();
-	ColliderMesh finalMeshB = b.getMesh();
+	ColliderMesh finalMeshA = a->getMesh();
+	ColliderMesh finalMeshB = b->getMesh();
 
 	finalMeshA.axes[0] = collisionPointA;
 	finalMeshB.axes[0] = collisionPointB;
 
-	finalMeshA.axes[1] = b.transform.acceleration;
-	finalMeshB.axes[1] = a.transform.acceleration;
+	finalMeshA.axes[1] = b->transform.acceleration;
+	finalMeshB.axes[1] = a->transform.acceleration;
 	
-	//compute the force acting on the object currently
-	finalMeshA.axes[1].x *= b.transform.mass;
-	finalMeshA.axes[1].y *= b.transform.mass;
-	finalMeshA.axes[1].z *= b.transform.mass;
-	
-	finalMeshB.axes[1].x *= a.transform.mass;
-	finalMeshB.axes[1].y *= a.transform.mass;
-	finalMeshB.axes[1].z *= a.transform.mass;
+	//for now, we will try -k set to -1
 
-	//now I have calculated the collision point of the sphere, need to update them in some way
+	//compute the force acting on the object currently
+	finalMeshA.axes[1].x *= b->transform.mass / -1;
+	finalMeshA.axes[1].y *= b->transform.mass / -1;
+	finalMeshA.axes[1].z *= b->transform.mass / -1;
+	
+	finalMeshB.axes[1].x *= a->transform.mass / -1;
+	finalMeshB.axes[1].y *= a->transform.mass / -1;
+	finalMeshB.axes[1].z *= a->transform.mass / -1;
+
+	//update the mesh with the collision point and the deformation vector
+	a->setMesh(finalMeshA);
+	b->setMesh(finalMeshB);
 
 	return distance < a1.vec2.x + a2.vec2.x;
 }

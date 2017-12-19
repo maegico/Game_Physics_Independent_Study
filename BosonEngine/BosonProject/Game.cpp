@@ -23,8 +23,14 @@ HRESULT Game::Init()
 	Mesh* mesh = assetManager.GetMesh(meshName.c_str());
 	ColliderMesh cmesh = assetManager.GetColliderMesh(meshName.c_str());
 	Material* mat = assetManager.GetMaterial("base");
+
+	std::string meshName2 = "sphere2.obj";
+	Mesh* mesh2 = assetManager.GetMesh(meshName2.c_str());
+	ColliderMesh cmesh2 = assetManager.GetColliderMesh(meshName2.c_str());
+	Material* mat2 = assetManager.GetMaterial("softbody");
+
 	objs["test1"] = (EntityInterface*)new BasicEntity(mesh, cmesh, mat);
-	objs["test2"] = (EntityInterface*)new BasicEntity(mesh, cmesh, mat);
+	objs["test2"] = (EntityInterface*)new BasicEntity(mesh2, cmesh2, mat2);
 
 	objs["test1"]->transform.position = DirectX::XMFLOAT3(2, 0, 0);
 	objs["test2"]->transform.position = DirectX::XMFLOAT3(-2, 0, 0);
@@ -41,13 +47,11 @@ HRESULT Game::Init()
 void Game::Update()
 {
 	//now does the update based on forces
-	if (GetAsyncKeyState('K') & 0x8000) { objs["test1"]->transform.force.x += -1.000f; }
-	if (GetAsyncKeyState('L') & 0x8000) { objs["test1"]->transform.force.x += 1.000f; }
+	if (GetAsyncKeyState('K') & 0x8000) { objs["test1"]->transform.force.x += -0.600f; }
+	if (GetAsyncKeyState('L') & 0x8000) { objs["test1"]->transform.force.x += 0.600f; }
 
 	//Update all game objs and other graphics related values
 	GraphicsCore::Update();
-
-	//Update Colliders here
 
 	//Check Collisions
 	collisionManager.CheckCollisions();

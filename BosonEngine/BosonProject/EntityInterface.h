@@ -8,7 +8,7 @@ class EntityInterface
 {
 public:
 	EntityInterface(Mesh* mesh, Material* mat, ColliderType colType, ColliderMesh cmesh)
-		: mesh(mesh), mat(mat), collider(colType, cmesh, transform)
+		: mesh(mesh), mat(mat), collider(new Collider(colType, cmesh, transform))
 	{
 		transform = { DirectX::XMFLOAT3(0,0,1), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0),
 			DirectX::XMFLOAT3(1,1,1), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), DirectX::XMFLOAT3(0,0,0), 1 };
@@ -63,7 +63,7 @@ public:
 	Mesh* GetMesh() { return mesh; }
 	Material* GetMaterial() { return mat; }
 	Transform transform;
-	Collider collider;
+	Collider* collider;
 private:
 	Mesh* mesh;
 	Material* mat;

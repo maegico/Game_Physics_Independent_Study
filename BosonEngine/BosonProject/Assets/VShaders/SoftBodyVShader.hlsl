@@ -8,7 +8,9 @@ cbuffer externalData : register(b0)
 cbuffer softbodyData : register(b1)
 {
 	float3 deformationVector;
+	float nope;
 	float3 collisionPoint;
+	float nope2;
 };
 
 //need to actually figure out what will go into a soft body interaction
@@ -43,18 +45,20 @@ VertexToPixel main(VertexShaderInput input)
 {
 	VertexToPixel output;
 
-	matrix worldViewProj = mul(mul(world, view), projection);
-	output.position = mul(float4(input.position, 1.0f), worldViewProj);
+	float3 alteredPosition = input.position;
 
 	//since we store the collision point in world space
-	float distance = length(output.position - collisionPoint);
+	float distance = length(input.position - collisionPoint);
 	//try a function like (x+2/x^2), x being the distance
 	//need to be careful with the fact that:
-		//the deformation is increased scaled for distance < .5 about
+	//the deformation is increased scaled for distance < .5 about
 	distance = (distance + 1) / (distance * distance * 10);
 	float3 scaleDeformVec = deformationVector * distance;
 
-	output.position += float4(scaleDeformVec, 0.0f);
+	alteredPosition += scaleDeformVec / 200;
+
+	matrix worldViewProj = mul(mul(world, view), projection);
+	output.position = mul(float4(alteredPosition, 1.0f), worldViewProj);
 
 	return output;
 }

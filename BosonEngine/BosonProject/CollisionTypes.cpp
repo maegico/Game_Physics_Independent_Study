@@ -77,6 +77,7 @@ ColliderMesh ColliderMeshFunctions::computeColliderMesh(MeshType meshType, std::
 		cmesh.axes[2] = DirectX::XMFLOAT3(0, 0, 1);
 		break;
 	case MeshType::Sphere:
+	case MeshType::SBSphere:
 		for (int i = 0; i < vertArray.size(); i++)
 		{
 			//XMVector3Length
@@ -136,75 +137,6 @@ ColliderMesh ColliderMeshFunctions::computeColliderMesh(MeshType meshType, std::
 					break;
 				}
 				XMStoreFloat3(&cmesh.vec1, centerTemp);
-
-				if (i + 1 == vertArray.size())
-					notFitted = false;
-
-				count++;
-				printf("Number of fit iterations: %d", count);
-			}
-		}
-		break;
-	case MeshType::SBSphere:
-		for (int i = 0; i < vertArray.size(); i++)
-		{
-			//XMVector3Length
-			DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vertArray[0].Position);
-			DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&vertArray[i].Position);
-
-			DirectX::XMVECTOR length = DirectX::XMVector3Length(v1 - v2);
-			float temp;
-			DirectX::XMStoreFloat(&temp, length);
-			if (mag < temp)
-			{
-				index1 = i;
-				mag = temp;
-			}
-		}
-
-		for (int i = 0; i < vertArray.size(); i++)
-		{
-			//XMVector3Length
-			DirectX::XMVECTOR v1 = DirectX::XMLoadFloat3(&vertArray[index1].Position);
-			DirectX::XMVECTOR v2 = DirectX::XMLoadFloat3(&vertArray[i].Position);
-			DirectX::XMVECTOR length = DirectX::XMVector3Length(v1 - v2);
-			float temp;
-			DirectX::XMStoreFloat(&temp, length);
-			if (mag < temp)
-			{
-				index2 = i;
-				mag = temp;
-			}
-		}
-
-		DirectX::XMVECTOR sbv1 = DirectX::XMLoadFloat3(&vertArray[index1].Position);
-		DirectX::XMVECTOR sbv2 = DirectX::XMLoadFloat3(&vertArray[index2].Position);
-		DirectX::XMVECTOR sblength = DirectX::XMVector3Length(sbv1 - sbv2);
-
-		DirectX::XMStoreFloat(&cmesh.vec2.x, sblength);
-		cmesh.vec2.x /= 2;
-
-		DirectX::XMVECTOR tempCenter = sbv1 + DirectX::XMVector3Normalize(sbv2 - sbv1) * cmesh.vec2.x;
-
-
-		while (notFitted)
-		{
-			for (int i = 0; i < vertArray.size(); i++)
-			{
-				float tempDistance;
-
-				DirectX::XMVECTOR vec = DirectX::XMLoadFloat3(&vertArray[i].Position);
-				DirectX::XMVECTOR tempLength = DirectX::XMVector3Length(tempCenter - vec);
-				DirectX::XMStoreFloat(&tempDistance, tempLength);
-				if (tempDistance > cmesh.vec2.x)
-				{
-					float change = (tempDistance - cmesh.vec2.x) / 2.0f;
-					cmesh.vec2.x += change;
-
-					centerTemp += DirectX::XMVector3Normalize(vec - tempCenter) * change;
-					break;
-				}
-				XMStoreFloat3(&cmesh.vec1, tempCenter);
 
 				if (i + 1 == vertArray.size())
 					notFitted = false;

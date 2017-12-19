@@ -258,10 +258,6 @@ void GraphicsCore::Draw()
 	{
 		if (i->second != nullptr)
 		{
-			//DirectX::XMFLOAT4X4 identity;
-			//DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
-			//matrices = { identity, identity, identity };
-			
 			//calculate model matrix here
 			DirectX::XMFLOAT4X4 worldMat;
 			DirectX::XMVECTOR tempPosition = DirectX::XMLoadFloat3(&(i->second->transform.position));;
@@ -279,7 +275,8 @@ void GraphicsCore::Draw()
 				camera->getProjectionMatrix()
 			};
 
-			ID3D11Buffer* cBuffer;
+			ID3D11Buffer* cBuffer = nullptr;
+			ID3D11Buffer* sbcBuffer = nullptr;
 
 			D3D11_BUFFER_DESC cbDesc;
 			cbDesc.ByteWidth = sizeof(matrices);
@@ -318,12 +315,47 @@ void GraphicsCore::Draw()
 			//call DrawIndexed
 			//immContext->UpdateSubresource(cBuffer, 0, 0, &matrices, 0, 0);
 			immContext->VSSetConstantBuffers(0, 1, &cBuffer);
+
+			if (i->second->collider->getMeshType() == MeshType::SBSphere)
+			{
+				sbData.collisionPoint = i->second->collider->mesh.axes[0];
+				sbData.deformationVector = i->second->collider->mesh.axes[1];
+
+				D3D11_BUFFER_DESC sbcbDesc;
+
+				int size = sizeof(sbData);
+
+				sbcbDesc.ByteWidth = sizeof(sbData);
+				sbcbDesc.Usage = D3D11_USAGE_DYNAMIC;
+				sbcbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+				sbcbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+				sbcbDesc.MiscFlags = 0;
+				sbcbDesc.StructureByteStride = 0;
+
+				// Fill in the subresource data.
+				D3D11_SUBRESOURCE_DATA InitSBData;
+				InitSBData.pSysMem = &sbData;
+				InitSBData.SysMemPitch = 0;
+				InitSBData.SysMemSlicePitch = 0;
+
+				// Create the buffer.
+				hr = device->CreateBuffer(&sbcbDesc, &InitSBData,
+					&sbcBuffer);
+
+				if (FAILED(hr))continue;
+
+				immContext->VSSetConstantBuffers(1, 1, &sbcBuffer);
+			}
+
 			vshader->SetShader(immContext);
 			pshader->SetPixelShader(immContext);
 			immContext->IASetVertexBuffers(0, 1, &vertBuff,
 				&stride, &offset);
 			immContext->IASetIndexBuffer(indexBuff, DXGI_FORMAT_R32_UINT, 0);
 			immContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+
+			cBuffer->Release();
+			if (sbcBuffer != nullptr) sbcBuffer->Release();
 		}
 	}
 

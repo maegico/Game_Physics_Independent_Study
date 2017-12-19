@@ -20,6 +20,14 @@ struct matrixData
 	DirectX::XMFLOAT4X4 proj;
 };
 
+struct SoftBodyData
+{
+	DirectX::XMFLOAT3 collisionPoint;
+	float nope;
+	DirectX::XMFLOAT3 deformationVector;
+	float nope2;
+};
+
 class GraphicsCore
 {
 protected:
@@ -56,6 +64,7 @@ private:
 	ID3D11RenderTargetView* backBuffer;
 	ID3D11DepthStencilView* depthStencilView;
 	matrixData matrices;
+	SoftBodyData sbData;
 
 	//ThreadManager* threadManager;
 

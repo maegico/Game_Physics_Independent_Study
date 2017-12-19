@@ -16,7 +16,7 @@ void collisionResolution()
 
 void BasicEntity::Init()
 {
-	collider.onCollision = collisionResolution;
+	collider->onCollision = collisionResolution;
 }
 
 void BasicEntity::Update(float deltaTime)

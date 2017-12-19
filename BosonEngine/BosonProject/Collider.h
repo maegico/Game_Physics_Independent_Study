@@ -10,6 +10,7 @@ class Collider
 public:
 	bool inUse;
 	Transform& transform;
+	ColliderMesh mesh;
 
 	Collider(ColliderType colliderType, ColliderMesh cmesh, Transform& transform);
 	~Collider();
@@ -23,6 +24,6 @@ public:
 	void(*onCollision)();
 private:
 	ColliderType colType;
-	ColliderMesh mesh;
+	
 	int id;
 };

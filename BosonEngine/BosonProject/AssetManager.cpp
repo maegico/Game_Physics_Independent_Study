@@ -88,7 +88,7 @@ void AssetManager::Init(ID3D11Device * device, ID3D11DeviceContext * context)
 	}
 
 	LoadMaterial("base", "sampler", "VertexShader.cso", "PixelShader.cso", "");
-	LoadMaterial("base", "sampler", "SoftBodyVShader.cso", "PixelShader.cso", "");
+	LoadMaterial("softbody", "sampler", "SoftBodyVShader.cso", "PixelShader.cso", "");
 }
 
 Material* AssetManager::LoadMaterial(std::string name, std::string samplerName, std::string vs, std::string ps, std::string textureName)
@@ -451,7 +451,7 @@ void AssetManager::CreateVShader(std::wstring shader, ID3D11Device* device)
 {
 	std::wstring compiledName = shader.substr(0, shader.length() - 4);
 	compiledName += L"cso";
-	std::wstring releasePath = L"../Debug/";
+	std::wstring releasePath = L"../x64/Debug/";
 	releasePath = releasePath + compiledName;
 
 	std::wstring debugPath = L"Assets/VShaders/" + compiledName;
@@ -501,7 +501,7 @@ void AssetManager::CreatePShader(std::wstring shader, ID3D11Device* device)
 {
 	std::wstring compiledName = shader.substr(0, shader.length() - 4);
 	compiledName += L"cso";
-	std::wstring releasePath = L"../Debug/";
+	std::wstring releasePath = L"../x64/Debug/";
 	releasePath = releasePath + compiledName;
 
 	std::wstring debugPath = L"Assets/VShaders/" + compiledName;
