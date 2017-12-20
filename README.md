@@ -23,3 +23,9 @@ I find the distance between the current vertex and the collision point.
 After that I put that through an equation and use it as a scale factor for the deformation vector.
   I use the equation distance = (distance + 1) / (distance * distance * 10).
 Finally, I add that to the vertex position, before multiplying the vertex by the MVP matrix.
+
+Now, I use a k of -1 in the engine, so this essentially becomes an equations likening deformation to acceleration.
+I use that with the scaling function to really create my soft body physics.
+The pros of this method: Small memory footprint, simple to implement, fast as most work is done in the shader
+The cons: the deformation is completely based on the scaling function in the shader,
+          depending on how the physics system is coded getting data to the graphics might be a little tricky.
